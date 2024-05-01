@@ -20,8 +20,18 @@ class AlterTable(ExpressionHandler):
                     constraint = ConstraintDesc(expression, action)
                     self.parse_result.append_add_constraints(constraint)
                 if isinstance(action, AlterColumn):
-                    alter = AlterColumnTypeDesc(expression, action)
-                    self.parse_result.append_alter_column_type(alter)
+                    alter_column = action.find(AlterColumn)
+                    dtype = alter_column.args.get('dtype')
+                    drop = alter_column.args.get('drop')
+                    alter_column.sql()
+                    if dtype is not None:
+                        alter = AlterColumnTypeDesc(expression, alter_column)
+                        self.parse_result.append_alter_column_type(alter)
+                    elif drop is not None:
+                        desc = DropColumnDesc(expression, alter_column)
+                        self.parse_result.append_drop_column_default(desc)
+                    else:
+                        self.parse_result.append_cant_parse(expression.sql())
                 if isinstance(action, Drop):
                     drop_column = DropColumnDesc(expression, action)
                     self.parse_result.append_drop_column(drop_column)

@@ -4,6 +4,7 @@ from typing import List, Dict
 from result.add_column_desc import AddColumnDesc
 from result.alter_column_type_desc import AlterColumnTypeDesc
 from result.constraint_desc import ConstraintDesc
+from result.drop_column_default_desc import DropColumnDefaultDesc
 from result.drop_column_desc import DropColumnDesc
 
 log = logging.getLogger(__name__)
@@ -22,6 +23,9 @@ class ParseResult:
 
         # 字段类型修改
         self._alter_column_types: List[AlterColumnTypeDesc] = []
+
+        # 字段删除默认值
+        self._drop_column_defaults: List[DropColumnDefaultDesc] = []
 
         # 字段删除
         self._drop_columns: List[DropColumnDesc] = []
@@ -58,6 +62,9 @@ class ParseResult:
 
     def get_column_comments(self) -> Dict[str, Dict[str, str]]:
         return self._column_comments
+
+    def get_drop_column_defaults(self) -> List[DropColumnDefaultDesc]:
+        return self._drop_column_defaults
 
     def append_cant_parse(self, sql):
         if sql not in self._cant_parse:
@@ -123,3 +130,11 @@ sql2: {constraint.expression.sql()}""")
                 log.warning(f"表 {table} 字段 {column} 注释定义重复 {inner_comment} -> {comment}")
 
             table_dict[column] = comment
+
+    def append_drop_column_default(self, desc: DropColumnDefaultDesc):
+        table = desc.table
+        column = desc.column
+        for inner in self._drop_column_defaults:
+            if inner.table.__eq__(table) and inner.column.__eq__(column):
+                log.warning(f"表 {table} 字段 {column} 删除重复")
+        self._drop_column_defaults.append(desc)

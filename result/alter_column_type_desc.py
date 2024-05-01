@@ -6,9 +6,8 @@ log = logging.getLogger(__name__)
 
 
 class AlterColumnTypeDesc:
-    def __init__(self, expression: AlterTable, action: AlterColumn):
+    def __init__(self, expression: AlterTable, alter_column: AlterColumn):
         table = expression.find(Table)
-        alter_column = action.find(AlterColumn)
 
         # 所属表
         self.table = table.name
