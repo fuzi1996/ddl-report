@@ -34,7 +34,3 @@ class TestParseCreateTable(unittest.TestCase):
                 self.assertEqual(type, "DATE")
             else:
                 self.assertEqual(type, "VARCHAR(2000)")
-
-
-if __name__ == '__main__':
-    unittest.main()

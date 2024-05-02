@@ -20,7 +20,3 @@ class TestParseAddColumn(unittest.TestCase):
         self.assertEqual(add_column.table, 'a_table')
         self.assertEqual(add_column.column, 'a_column')
         self.assertEqual(add_column.type, 'VARCHAR(200)')
-
-
-if __name__ == '__main__':
-    unittest.main()

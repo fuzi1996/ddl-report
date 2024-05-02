@@ -34,7 +34,3 @@ class TestParseDropTable(unittest.TestCase):
         drop_tables = parse_result.get_drop_tables()
         self.assertEqual(len(drop_tables), 1)
         self.assertEqual(drop_tables[0], table_name)
-
-
-if __name__ == '__main__':
-    unittest.main()

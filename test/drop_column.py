@@ -19,7 +19,3 @@ class TestParseDropColumn(unittest.TestCase):
         drop_column = drop_columns[0]
         self.assertEqual(drop_column.table, 'b_table')
         self.assertEqual(drop_column.column, 'b_column')
-
-
-if __name__ == '__main__':
-    unittest.main()

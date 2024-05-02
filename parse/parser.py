@@ -7,7 +7,7 @@ from sqlglot.expressions import *
 import dialect.postgres
 import handler.alter_table
 from handler.comment_column import CommentColumn
-from handler.create_table import CreateTable
+from handler.createhandler import CreateHandler
 from handler.drop_table import DropTable
 from result.result import ParseResult
 
@@ -24,7 +24,7 @@ class Parser:
         self._expressions: Expression | None = None
 
         self._parse_result = ParseResult()
-        self._create_table = CreateTable(self._parse_result)
+        self._create_table = CreateHandler(self._parse_result)
         self._drop_table = DropTable(self._parse_result)
         self._alter_table = handler.alter_table.AlterTable(self._parse_result)
         self._comment_column = handler.comment_column.CommentColumn(self._parse_result)
@@ -46,7 +46,7 @@ class Parser:
                 self._alter_table.del_expression(expression)
             elif isinstance(expression, Comment):
                 self._comment_column.del_expression(expression)
-            elif isinstance(expression, Create):
+            elif isinstance(expression, sqlglot.expressions.Create):
                 self._create_table.del_expression(expression)
             else:
                 self._parse_result.append_cant_parse(expression.sql())

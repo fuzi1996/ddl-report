@@ -15,6 +15,8 @@ class ParseResult:
     def __init__(self):
         self._create_tables: List[CreateTableDesc] = []
 
+        self._create_view: List[str] = []
+
         # 元素中每一项都是drop的表名
         self._drop_tables: List[str] = []
 
@@ -48,6 +50,9 @@ class ParseResult:
     def get_create_tables(self) -> List[CreateTableDesc]:
         return self._create_tables
 
+    def get_create_view(self) -> List[str]:
+        return self._create_view
+
     def get_drop_tables(self) -> List[str]:
         return self._drop_tables
 
@@ -78,6 +83,12 @@ class ParseResult:
             if inner.table.__eq__(table):
                 log.warning(f"表 {table} 定义重复\nsql1: {inner.expression.sql()}\nsql2: {desc.expression.sql()}")
         self._create_tables.append(desc)
+
+    def append_create_view(self, view: str):
+        for inner in self._create_view:
+            if inner.__eq__(view):
+                log.warning(f"视图 {view} 定义重复")
+        self._create_view.append(view)
 
     def append_cant_parse(self, sql):
         if sql not in self._cant_parse:

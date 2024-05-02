@@ -63,7 +63,3 @@ class TestParseAddConstraint(unittest.TestCase):
         self.assertEqual(len(constraint.columns), 1)
         self.assertListEqual(constraint.columns, ["name"])
         self.assertIsNotNone(constraint.expression)
-
-
-if __name__ == '__main__':
-    unittest.main()

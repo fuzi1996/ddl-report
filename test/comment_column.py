@@ -46,7 +46,3 @@ class TestParseCommentColumn(unittest.TestCase):
         self.assertIsNotNone(column_comment)
         self.assertEqual(column_comment['a_column'], '注释1')
         self.assertEqual(column_comment['d_column'], '注释2')
-
-
-if __name__ == '__main__':
-    unittest.main()

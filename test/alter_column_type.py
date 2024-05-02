@@ -35,7 +35,3 @@ class TestParseAlterColumnType(unittest.TestCase):
         self.assertEqual(alter.table, 'b_table')
         self.assertEqual(alter.column, 'b_column')
         self.assertEqual(alter.type, 'TEXT')
-
-
-if __name__ == '__main__':
-    unittest.main()
