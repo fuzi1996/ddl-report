@@ -4,6 +4,7 @@ from typing import List, Dict
 from result.add_column_desc import AddColumnDesc
 from result.alter_column_type_desc import AlterColumnTypeDesc
 from result.constraint_desc import ConstraintDesc
+from result.create_table_desc import CreateTableDesc
 from result.drop_column_default_desc import DropColumnDefaultDesc
 from result.drop_column_desc import DropColumnDesc
 
@@ -12,6 +13,8 @@ log = logging.getLogger(__name__)
 
 class ParseResult:
     def __init__(self):
+        self._create_tables: List[CreateTableDesc] = []
+
         # 元素中每一项都是drop的表名
         self._drop_tables: List[str] = []
 
@@ -42,6 +45,9 @@ class ParseResult:
         """
         self._column_comments: Dict[str, Dict[str, str]] = {}
 
+    def get_create_tables(self) -> List[CreateTableDesc]:
+        return self._create_tables
+
     def get_drop_tables(self) -> List[str]:
         return self._drop_tables
 
@@ -65,6 +71,13 @@ class ParseResult:
 
     def get_drop_column_defaults(self) -> List[DropColumnDefaultDesc]:
         return self._drop_column_defaults
+
+    def append_create_table(self, desc: CreateTableDesc):
+        table = desc.table
+        for inner in self._create_tables:
+            if inner.table.__eq__(table):
+                log.warning(f"表 {table} 定义重复\nsql1: {inner.expression.sql()}\nsql2: {desc.expression.sql()}")
+        self._create_tables.append(desc)
 
     def append_cant_parse(self, sql):
         if sql not in self._cant_parse:
