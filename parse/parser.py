@@ -7,7 +7,7 @@ from sqlglot.expressions import *
 import dialect.postgres
 import handler.alter_table
 from handler.comment_column import CommentColumn
-from handler.createhandler import CreateHandler
+from handler.create_handler import CreateHandler
 from handler.drop_table import DropTable
 from result.result import ParseResult
 

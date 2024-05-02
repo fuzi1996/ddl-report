@@ -3,10 +3,10 @@ from typing import List, Dict
 
 from result.add_column_desc import AddColumnDesc
 from result.alter_column_type_desc import AlterColumnTypeDesc
-from result.constraint_desc import ConstraintDesc
 from result.create_table_desc import CreateTableDesc
 from result.drop_column_default_desc import DropColumnDefaultDesc
 from result.drop_column_desc import DropColumnDesc
+from result.index_desc import IndexDesc
 
 log = logging.getLogger(__name__)
 
@@ -24,7 +24,7 @@ class ParseResult:
         self._cant_parse: List[str] = []
 
         # 添加约束
-        self._add_constraints: List[ConstraintDesc] = []
+        self._add_indexs: List[IndexDesc] = []
 
         # 字段类型修改
         self._alter_column_types: List[AlterColumnTypeDesc] = []
@@ -59,8 +59,8 @@ class ParseResult:
     def get_cant_parse(self) -> List[str]:
         return self._cant_parse
 
-    def get_add_constraints(self) -> List[ConstraintDesc]:
-        return self._add_constraints
+    def get_add_index(self) -> List[IndexDesc]:
+        return self._add_indexs
 
     def get_alter_column_types(self) -> List[AlterColumnTypeDesc]:
         return self._alter_column_types
@@ -98,18 +98,18 @@ class ParseResult:
         if table_name not in self._drop_tables:
             self._drop_tables.append(table_name)
 
-    def append_add_constraints(self, constraint: ConstraintDesc):
-        name = constraint.name
-        table = constraint.table
+    def append_add_index(self, index: IndexDesc):
+        name = index.name
+        table = index.table
 
-        for inner_constraint in self._add_constraints:
+        for inner_constraint in self._add_indexs:
             if inner_constraint.table.__eq__(table) and inner_constraint.name.__eq__(name):
                 # 该表下已经存在同名约束
                 log.warning(
                     f"""表 {table} 下约束 {name} 定义重复
 sql1: {inner_constraint.expression.sql()}
-sql2: {constraint.expression.sql()}""")
-        self._add_constraints.append(constraint)
+sql2: {index.expression.sql()}""")
+        self._add_indexs.append(index)
 
     def append_alter_column_type(self, alter: AlterColumnTypeDesc):
         table = alter.table

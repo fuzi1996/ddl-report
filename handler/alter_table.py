@@ -6,7 +6,7 @@ from handler.expression_handler import ExpressionHandler
 from result.add_column_desc import AddColumnDesc
 from result.alter_column_type_desc import AlterColumnTypeDesc
 from result.drop_column_desc import DropColumnDesc
-from result.result import ConstraintDesc
+from result.index_desc import ConstraintDesc
 
 
 # table ddl
@@ -17,8 +17,8 @@ class AlterTable(ExpressionHandler):
         if len(actions) > 0:
             for action in actions:
                 if isinstance(action, AddConstraint):
-                    constraint = ConstraintDesc(expression, action)
-                    self.parse_result.append_add_constraints(constraint)
+                    index = ConstraintDesc.parse(expression, action)
+                    self.parse_result.append_add_index(index)
                 if isinstance(action, AlterColumn):
                     alter_column = action.find(AlterColumn)
                     dtype = alter_column.args.get('dtype')
