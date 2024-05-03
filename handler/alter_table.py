@@ -19,7 +19,7 @@ class AlterTable(ExpressionHandler):
                 if isinstance(action, AddConstraint):
                     index = ConstraintDesc.parse(expression, action)
                     self.parse_result.append_add_index(index)
-                if isinstance(action, AlterColumn):
+                elif isinstance(action, AlterColumn):
                     alter_column = action.find(AlterColumn)
                     dtype = alter_column.args.get('dtype')
                     drop = alter_column.args.get('drop')
@@ -32,10 +32,10 @@ class AlterTable(ExpressionHandler):
                         self.parse_result.append_drop_column_default(desc)
                     else:
                         self.parse_result.append_cant_parse(expression.sql())
-                if isinstance(action, Drop):
+                elif isinstance(action, Drop):
                     drop_column = DropColumnDesc(expression, action)
                     self.parse_result.append_drop_column(drop_column)
-                if isinstance(action, ColumnDef):
+                elif isinstance(action, ColumnDef):
                     add_column = AddColumnDesc(expression, action)
                     self.parse_result.append_add_column(add_column)
                 else:

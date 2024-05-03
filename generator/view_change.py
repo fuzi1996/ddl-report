@@ -8,11 +8,9 @@ class ViewChange(BaseGenerator):
         if len(views) > 0:
             result = "\n".join([f"- {view}" for view in views])
         return f"""
-
 ## 视图
 
 ### 新增视图
 
 {result}
-
-"""
+    """

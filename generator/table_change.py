@@ -20,8 +20,7 @@ class TableChange(BaseGenerator):
             columns.append(f"| {column_name} | {column_type} | {column_comment} |")
         column_descs = "\n".join(columns)
 
-        return f"""
-#### {create_table_header}
+        return f"""#### {create_table_header}
 
 | 字段 | 类型 | 备注 |
 | --- | --- | --- |
@@ -48,8 +47,7 @@ class TableChange(BaseGenerator):
                 else:
                     index_desc.append(f"| {index_name} | {table_name}.{columns[0]} | {index_comment} |")
             index_str = "\n".join(index_desc)
-            return f"""
-| 索引名 | 对应字段 | 备注 |
+            return f"""| 索引名 | 对应字段 | 备注 |
 | --- | --- | --- |
 {index_str}
             """
@@ -65,8 +63,7 @@ class TableChange(BaseGenerator):
         create_index = self.generate_create_index() or "无"
         drop_table = self.generate_drop_table() or "无"
 
-        return f"""
-## 数据表
+        return f"""## 数据表
 
 ### 新建表
 
