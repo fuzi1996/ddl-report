@@ -38,6 +38,12 @@ class AlterTable(ExpressionHandler):
                 elif isinstance(action, ColumnDef):
                     add_column = AddColumnDesc(expression, action)
                     self.parse_result.append_add_column(add_column)
+                elif isinstance(action, RenameColumn):
+                    table = expression.find(Table)
+                    old_column = action.args.get('this')
+                    new_column = action.args.get('to')
+                    table_name = table.name
+                    self.parse_result.append_rename_column(table_name, old_column.name, new_column.name)
                 else:
                     self.parse_result.append_cant_parse(expression.sql())
         else:

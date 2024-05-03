@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 
 from generator.base_generator import BaseGenerator
 from result.add_column_desc import AddColumnDesc
@@ -56,10 +56,26 @@ class FiledChange(BaseGenerator):
         else:
             return "无"
 
+    def generate_rename_column(self) -> str:
+        rename_columns: Dict[str, Dict[str, str]] = self.parse_result.get_rename_columns()
+        if len(rename_columns) > 0:
+            rename_column_type_strs = []
+            for table, rename_columns in rename_columns.items():
+                for old_column, new_column in rename_columns.items():
+                    rename_column_type_strs.append(f"| {table} | {old_column} | {new_column} |")
+            result = "\n".join(rename_column_type_strs)
+            return f"""| 表 | 原字段 | 修改后新字段 |
+| --- | --- | --- |
+{result}
+            """
+        else:
+            return "无"
+
     def generate(self) -> str:
         add_columns = self.generate_add_columns()
         drop_columns = self.generate_drop_columns()
         alter_column_type = self.generate_alter_column_types()
+        rename_columns = self.generate_rename_column()
 
         return f"""
 ## 字段
@@ -71,6 +87,10 @@ class FiledChange(BaseGenerator):
 ### 字段删除
 
 {drop_columns}
+
+### 字段重命名
+
+{rename_columns}
 
 ### 字段类型修改
 

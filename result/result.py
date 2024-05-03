@@ -40,6 +40,15 @@ class ParseResult:
 
         """
         {
+            table_name: {
+                old_column: new_column 
+            }
+        }
+        """
+        self._rename_columns: Dict[str, Dict[str, str]] = {}
+
+        """
+        {
             table_name: table_comment
         }
         """
@@ -83,6 +92,9 @@ class ParseResult:
 
     def get_table_comments(self) -> Dict[str, str]:
         return self._table_comments
+
+    def get_rename_columns(self) -> Dict[str, Dict[str, str]]:
+        return self._rename_columns
 
     def get_column_comment(self, table, column) -> str:
         table_dict = self._column_comments.get(table)
@@ -190,3 +202,15 @@ sql2: {index.expression.sql()}""")
             if inner.table.__eq__(table) and inner.column.__eq__(column):
                 log.warning(f"表 {table} 字段 {column} 删除重复")
         self._drop_column_defaults.append(desc)
+
+    def append_rename_column(self, table, old_column, new_column):
+        table_dict = self._rename_columns.get(table)
+        if table_dict is None:
+            self._rename_columns[table] = {
+                old_column: new_column
+            }
+        else:
+            inner = table_dict.get(old_column)
+            if inner is not None:
+                log.warning(f"表 {table} 字段 {old_column} 重命名重复 {old_column} -> {new_column}")
+            table_dict[old_column] = new_column
