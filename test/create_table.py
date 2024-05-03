@@ -1,6 +1,7 @@
 import unittest
 from typing import List
 
+from generator import Generate
 from parse.parser import Parser
 from result.create_table_desc import CreateTableDesc
 
@@ -34,3 +35,19 @@ class TestParseCreateTable(unittest.TestCase):
                 self.assertEqual(type, "DATE")
             else:
                 self.assertEqual(type, "VARCHAR(2000)")
+
+
+class TestCreateTableGenerator(unittest.TestCase):
+    def test_create_table(self):
+        sql = """
+                    create table a_table
+                    (
+                        column_id      int8 not null constraint a_table_pk primary key,
+                        column_2       date,
+                        column_3       varchar(2000)
+                    );
+                """
+        parse = Parser(sql)
+        parse.parse()
+        parse_result = parse.get_parse_result()
+        print(Generate.generate(parse_result))

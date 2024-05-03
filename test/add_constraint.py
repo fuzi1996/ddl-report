@@ -1,5 +1,6 @@
 import unittest
 
+from generator import Generate
 from parse.parser import Parser
 
 
@@ -63,3 +64,15 @@ class TestParseAddConstraint(unittest.TestCase):
         self.assertEqual(len(constraint.columns), 1)
         self.assertListEqual(constraint.columns, ["name"])
         self.assertIsNotNone(constraint.expression)
+
+
+class TestCreateConstraintGenerator(unittest.TestCase):
+    def test_create_constraint(self):
+        sql = """
+            ALTER TABLE persons ADD CONSTRAINT persons_pk PRIMARY KEY (first_name, last_name);
+            ALTER TABLE ONLY risk ADD CONSTRAINT risk_uk UNIQUE (name);
+        """
+        parse = Parser(sql)
+        parse.parse()
+        parse_result = parse.get_parse_result()
+        print(Generate.generate(parse_result))

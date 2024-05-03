@@ -40,6 +40,13 @@ class ParseResult:
 
         """
         {
+            table_name: table_comment
+        }
+        """
+        self._table_comments: Dict[str, str] = {}
+
+        """
+        {
             table_name: {
                 column_name: column_comment 
             }
@@ -73,6 +80,18 @@ class ParseResult:
 
     def get_column_comments(self) -> Dict[str, Dict[str, str]]:
         return self._column_comments
+
+    def get_table_comments(self) -> Dict[str, str]:
+        return self._table_comments
+
+    def get_column_comment(self, table, column) -> str:
+        table_dict = self._column_comments.get(table)
+        if table_dict is not None:
+            return table_dict.get(column) or ""
+        return ""
+
+    def get_table_comment(self, table) -> str:
+        return self._table_comments.get(table) or ""
 
     def get_drop_column_defaults(self) -> List[DropColumnDefaultDesc]:
         return self._drop_column_defaults
@@ -154,6 +173,15 @@ sql2: {index.expression.sql()}""")
                 log.warning(f"表 {table} 字段 {column} 注释定义重复 {inner_comment} -> {comment}")
 
             table_dict[column] = comment
+
+    def put_table_column(self, table, comment):
+        table_comment = self._table_comments.get(table)
+        if table_comment is None:
+            self._table_comments[table] = comment
+        else:
+            if not table_comment.__eq__(comment):
+                log.warning(f"表 {table} 注释定义重复 {table_comment} -> {comment}")
+            self._table_comments[table] = comment
 
     def append_drop_column_default(self, desc: DropColumnDefaultDesc):
         table = desc.table

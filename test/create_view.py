@@ -1,7 +1,9 @@
 import unittest
 from typing import List
 
+from generator import Generate
 from parse.parser import Parser
+from result.result import ParseResult
 
 
 class TestParseCreateTable(unittest.TestCase):
@@ -17,3 +19,12 @@ class TestParseCreateTable(unittest.TestCase):
 
         view = views[0]
         self.assertEqual(view, "v_view")
+
+
+class TestCreateViewGenerator(unittest.TestCase):
+    def test_create_view(self):
+        parse_result = ParseResult()
+        parse_result.append_create_view("a_view")
+        parse_result.append_create_view("b_view")
+        parse_result.append_create_view("c_view")
+        print(Generate.generate(parse_result))

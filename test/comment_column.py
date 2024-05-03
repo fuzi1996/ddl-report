@@ -5,7 +5,7 @@ from parse.parser import Parser
 
 
 class TestParseCommentColumn(unittest.TestCase):
-    def test_add_column(self):
+    def test_comment_column(self):
         sql = """
             COMMENT ON COLUMN d_table.d_column IS '注释1';
         """
@@ -46,3 +46,6 @@ class TestParseCommentColumn(unittest.TestCase):
         self.assertIsNotNone(column_comment)
         self.assertEqual(column_comment['a_column'], '注释1')
         self.assertEqual(column_comment['d_column'], '注释2')
+
+        self.assertEqual(parse_result.get_column_comment("d_table", "a_column"), "注释1")
+        self.assertEqual(parse_result.get_column_comment("d_table", "b_column"), "")
