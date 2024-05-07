@@ -9,8 +9,8 @@ class TestParseCreateIndex(unittest.TestCase):
         sql = """
             create index i_index on a_table (code1,code2);
         """
-        parse = Parser(sql)
-        parse.parse()
+        parse = Parser()
+        parse.parse(sql)
         parse_result = parse.get_parse_result()
         indexs = parse_result.get_add_index()
         self.assertEqual(len(indexs), 1)
@@ -25,8 +25,8 @@ class TestParseCreateIndex(unittest.TestCase):
         sql = """
             create unique index i_index on a_table (code1,code2);
         """
-        parse = Parser(sql)
-        parse.parse()
+        parse = Parser()
+        parse.parse(sql)
         parse_result = parse.get_parse_result()
         indexs = parse_result.get_add_index()
         self.assertEqual(len(indexs), 1)
@@ -44,7 +44,7 @@ class TestCreateIndexGenerator(unittest.TestCase):
             create index i_index on a_table (code1);
             create unique index i_index on a_table (code1,code2);
         """
-        parse = Parser(sql)
-        parse.parse()
+        parse = Parser()
+        parse.parse(sql)
         parse_result = parse.get_parse_result()
         print(Generate.generate(parse_result))

@@ -11,8 +11,8 @@ class TestCantParseSql(unittest.TestCase):
         sql = """
             ALTER TABLE a_table ALTER COLUMN a_type SET NOT NULL;
         """
-        parse = Parser(sql)
-        parse.parse()
+        parse = Parser()
+        parse.parse(sql)
         parse_result = parse.get_parse_result()
         sqls: List[str] = parse_result.get_cant_parse()
         self.assertEqual(len(sqls), 1)

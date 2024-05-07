@@ -12,8 +12,8 @@ class TestParseDropColumn(unittest.TestCase):
             ALTER TABLE "b_table"
                 DROP COLUMN IF EXISTS "b_column";
         """
-        parse = Parser(sql)
-        parse.parse()
+        parse = Parser()
+        parse.parse(sql)
         parse_result = parse.get_parse_result()
         drop_columns: List[DropColumnDesc] = parse_result.get_drop_columns()
         self.assertEqual(len(drop_columns), 1)
@@ -28,7 +28,7 @@ class TestDropColumnGenerator(unittest.TestCase):
             ALTER TABLE "b_table"
                 DROP COLUMN IF EXISTS "b_column";    
             """
-        parse = Parser(sql)
-        parse.parse()
+        parse = Parser()
+        parse.parse(sql)
         parse_result = parse.get_parse_result()
         print(Generate.generate(parse_result))

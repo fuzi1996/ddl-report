@@ -7,8 +7,8 @@ from parse.parser import Parser
 class TestParseAddConstraint(unittest.TestCase):
     def test_primary_key(self):
         sql = "ALTER TABLE persons ADD CONSTRAINT persons_pk PRIMARY KEY (first_name, last_name)"
-        parse = Parser(sql)
-        parse.parse()
+        parse = Parser()
+        parse.parse(sql)
         parse_result = parse.get_parse_result()
         constraints = parse_result.get_add_index()
         self.assertEqual(len(constraints), 1)
@@ -26,8 +26,8 @@ class TestParseAddConstraint(unittest.TestCase):
             ALTER TABLE persons ADD CONSTRAINT persons_pk PRIMARY KEY (first_name1, last_name);
             ALTER TABLE persons ADD CONSTRAINT persons_pk PRIMARY KEY (first_name2, last_name);
         """
-        parse = Parser(sql)
-        parse.parse()
+        parse = Parser()
+        parse.parse(sql)
         parse_result = parse.get_parse_result()
         constraints = parse_result.get_add_index()
         self.assertEqual(len(constraints), 2)
@@ -51,8 +51,8 @@ class TestParseAddConstraint(unittest.TestCase):
 
     def test_unique_constraint(self):
         sql = "ALTER TABLE ONLY risk ADD CONSTRAINT risk_uk UNIQUE (name);"
-        parse = Parser(sql)
-        parse.parse()
+        parse = Parser()
+        parse.parse(sql)
         parse_result = parse.get_parse_result()
         constraints = parse_result.get_add_index()
         self.assertEqual(len(constraints), 1)
@@ -72,7 +72,7 @@ class TestCreateConstraintGenerator(unittest.TestCase):
             ALTER TABLE persons ADD CONSTRAINT persons_pk PRIMARY KEY (first_name, last_name);
             ALTER TABLE ONLY risk ADD CONSTRAINT risk_uk UNIQUE (name);
         """
-        parse = Parser(sql)
-        parse.parse()
+        parse = Parser()
+        parse.parse(sql)
         parse_result = parse.get_parse_result()
         print(Generate.generate(parse_result))

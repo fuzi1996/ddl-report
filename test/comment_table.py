@@ -9,8 +9,8 @@ class TestParseCommentTable(unittest.TestCase):
         sql = """
             comment on table a_table is 'a table';
         """
-        parse = Parser(sql)
-        parse.parse()
+        parse = Parser()
+        parse.parse(sql)
         parse_result = parse.get_parse_result()
         comments: Dict[str, str] = parse_result.get_table_comments()
         self.assertEqual(len(comments), 1)

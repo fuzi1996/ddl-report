@@ -11,8 +11,8 @@ class TestParseDropColumn(unittest.TestCase):
             ALTER TABLE IF EXISTS a_table
                 ALTER COLUMN id DROP DEFAULT;
         """
-        parse = Parser(sql)
-        parse.parse()
+        parse = Parser()
+        parse.parse(sql)
         parse_result = parse.get_parse_result()
         drop_column_defaults: List[DropColumnDefaultDesc] = parse_result.get_drop_column_defaults()
         self.assertEqual(len(drop_column_defaults), 1)

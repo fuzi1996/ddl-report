@@ -11,8 +11,8 @@ class TestParseAlterColumnType(unittest.TestCase):
         sql = """
             ALTER TABLE a_table ALTER COLUMN name1 TYPE character varying(300);
         """
-        parse = Parser(sql)
-        parse.parse()
+        parse = Parser()
+        parse.parse(sql)
         parse_result = parse.get_parse_result()
         alters: List[AlterColumnTypeDesc] = parse_result.get_alter_column_types()
         self.assertEqual(len(alters), 1)
@@ -26,8 +26,8 @@ class TestParseAlterColumnType(unittest.TestCase):
               ALTER TABLE b_table
                 ALTER COLUMN b_column TYPE text COLLATE "pg_catalog"."default" USING b_column::text;
         """
-        parse = Parser(sql)
-        parse.parse()
+        parse = Parser()
+        parse.parse(sql)
         parse_result = parse.get_parse_result()
         alters: List[AlterColumnTypeDesc] = parse_result.get_alter_column_types()
         self.assertEqual(len(alters), 1)
@@ -43,7 +43,7 @@ class TestAlterColumnTypeGenerator(unittest.TestCase):
             ALTER TABLE b_table
                 ALTER COLUMN b_column TYPE text COLLATE "pg_catalog"."default" USING b_column::text;    
             """
-        parse = Parser(sql)
-        parse.parse()
+        parse = Parser()
+        parse.parse(sql)
         parse_result = parse.get_parse_result()
         print(Generate.generate(parse_result))

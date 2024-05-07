@@ -16,8 +16,8 @@ class TestParseCreateTable(unittest.TestCase):
                 column_3       varchar(2000)
             );
         """
-        parse = Parser(sql)
-        parse.parse()
+        parse = Parser()
+        parse.parse(sql)
         parse_result = parse.get_parse_result()
         create_tables: List[CreateTableDesc] = parse_result.get_create_tables()
         self.assertEqual(len(create_tables), 1)
@@ -47,7 +47,7 @@ class TestCreateTableGenerator(unittest.TestCase):
                         column_3       varchar(2000)
                     );
                 """
-        parse = Parser(sql)
-        parse.parse()
+        parse = Parser()
+        parse.parse(sql)
         parse_result = parse.get_parse_result()
         print(Generate.generate(parse_result))

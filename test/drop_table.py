@@ -8,8 +8,8 @@ class TestParseDropTable(unittest.TestCase):
     def test(self):
         table_name = "a1"
         sql = f"drop table {table_name};"
-        parse = Parser(sql)
-        parse.parse()
+        parse = Parser()
+        parse.parse(sql)
         parse_result = parse.get_parse_result()
         drop_tables = parse_result.get_drop_tables()
         self.assertEqual(len(drop_tables), 1)
@@ -19,8 +19,8 @@ class TestParseDropTable(unittest.TestCase):
         table_name = "a1"
         table_name_with_schema = f"s.{table_name}"
         sql = f"drop table {table_name_with_schema};"
-        parse = Parser(sql)
-        parse.parse()
+        parse = Parser()
+        parse.parse(sql)
         parse_result = parse.get_parse_result()
         drop_tables = parse_result.get_drop_tables()
         self.assertEqual(len(drop_tables), 1)
@@ -29,8 +29,8 @@ class TestParseDropTable(unittest.TestCase):
     def test_with_exists(self):
         table_name = "a1"
         sql = f"DROP TABLE IF EXISTS {table_name};"
-        parse = Parser(sql)
-        parse.parse()
+        parse = Parser()
+        parse.parse(sql)
         parse_result = parse.get_parse_result()
         drop_tables = parse_result.get_drop_tables()
         self.assertEqual(len(drop_tables), 1)
@@ -43,7 +43,7 @@ class TestDropTableGenerate(unittest.TestCase):
             DROP TABLE table_1;
             DROP TABLE IF EXISTS table_2;
         """
-        parse = Parser(sql)
-        parse.parse()
+        parse = Parser()
+        parse.parse(sql)
         parse_result = parse.get_parse_result()
         print(Generate.generate(parse_result))

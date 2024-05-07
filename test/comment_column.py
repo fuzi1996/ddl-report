@@ -9,8 +9,8 @@ class TestParseCommentColumn(unittest.TestCase):
         sql = """
             COMMENT ON COLUMN d_table.d_column IS '注释1';
         """
-        parse = Parser(sql)
-        parse.parse()
+        parse = Parser()
+        parse.parse(sql)
         parse_result = parse.get_parse_result()
         comments: Dict[str, Dict[str, str]] = parse_result.get_column_comments()
         self.assertEqual(len(comments), 1)
@@ -23,8 +23,8 @@ class TestParseCommentColumn(unittest.TestCase):
             COMMENT ON COLUMN d_table.d_column IS '注释1';
             COMMENT ON COLUMN d_table.d_column IS '注释2';
         """
-        parse = Parser(sql)
-        parse.parse()
+        parse = Parser()
+        parse.parse(sql)
         parse_result = parse.get_parse_result()
         comments: Dict[str, Dict[str, str]] = parse_result.get_column_comments()
         self.assertEqual(len(comments), 1)
@@ -37,8 +37,8 @@ class TestParseCommentColumn(unittest.TestCase):
             COMMENT ON COLUMN d_table.a_column IS '注释1';
             COMMENT ON COLUMN d_table.d_column IS '注释2';
         """
-        parse = Parser(sql)
-        parse.parse()
+        parse = Parser()
+        parse.parse(sql)
         parse_result = parse.get_parse_result()
         comments: Dict[str, Dict[str, str]] = parse_result.get_column_comments()
         self.assertEqual(len(comments), 1)

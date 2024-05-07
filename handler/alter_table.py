@@ -7,12 +7,14 @@ from result.add_column_desc import AddColumnDesc
 from result.alter_column_type_desc import AlterColumnTypeDesc
 from result.drop_column_desc import DropColumnDesc
 from result.index_desc import ConstraintDesc
+from result.sql_wrapper import SqlWrapper
 
 
 # table ddl
 class AlterTable(ExpressionHandler):
 
-    def del_expression(self, expression: Expression):
+    def del_expression(self, sqlWrapper: SqlWrapper) -> None:
+        expression = sqlWrapper.expression
         actions: List[Expression] = expression.args.get('actions')
         if len(actions) > 0:
             for action in actions:
@@ -23,7 +25,6 @@ class AlterTable(ExpressionHandler):
                     alter_column = action.find(AlterColumn)
                     dtype = alter_column.args.get('dtype')
                     drop = alter_column.args.get('drop')
-                    alter_column.sql()
                     if dtype is not None:
                         alter = AlterColumnTypeDesc(expression, alter_column)
                         self.parse_result.append_alter_column_type(alter)
@@ -31,7 +32,7 @@ class AlterTable(ExpressionHandler):
                         desc = DropColumnDesc(expression, alter_column)
                         self.parse_result.append_drop_column_default(desc)
                     else:
-                        self.parse_result.append_cant_parse(expression.sql())
+                        self.parse_result.append_cant_parse(sqlWrapper.sql)
                 elif isinstance(action, Drop):
                     drop_column = DropColumnDesc(expression, action)
                     self.parse_result.append_drop_column(drop_column)
@@ -45,6 +46,6 @@ class AlterTable(ExpressionHandler):
                     table_name = table.name
                     self.parse_result.append_rename_column(table_name, old_column.name, new_column.name)
                 else:
-                    self.parse_result.append_cant_parse(expression.sql())
+                    self.parse_result.append_cant_parse(sqlWrapper.sql)
         else:
-            self.parse_result.append_cant_parse(expression.sql())
+            self.parse_result.append_cant_parse(sqlWrapper.sql)

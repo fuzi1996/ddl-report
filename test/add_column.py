@@ -12,8 +12,8 @@ class TestParseAddColumn(unittest.TestCase):
             ALTER TABLE IF EXISTS a_table
                 ADD COLUMN a_column varchar(200);
         """
-        parse = Parser(sql)
-        parse.parse()
+        parse = Parser()
+        parse.parse(sql)
         parse_result = parse.get_parse_result()
         add_columns: List[AddColumnDesc] = parse_result.get_add_columns()
         self.assertEqual(len(add_columns), 1)
@@ -29,7 +29,7 @@ class TestCreateTableGenerator(unittest.TestCase):
             ALTER TABLE IF EXISTS a_table
                 ADD COLUMN a_column varchar(200);    
             """
-        parse = Parser(sql)
-        parse.parse()
+        parse = Parser()
+        parse.parse(sql)
         parse_result = parse.get_parse_result()
         print(Generate.generate(parse_result))
