@@ -15,6 +15,7 @@ class AlterTable(ExpressionHandler):
 
     def del_expression(self, sqlWrapper: SqlWrapper) -> None:
         expression = sqlWrapper.expression
+        options: List[Expression] = expression.args.get('options')
         actions: List[Expression] = expression.args.get('actions')
         if len(actions) > 0:
             for action in actions:
@@ -25,12 +26,20 @@ class AlterTable(ExpressionHandler):
                     alter_column = action.find(AlterColumn)
                     dtype = alter_column.args.get('dtype')
                     drop = alter_column.args.get('drop')
+                    action.args.get('options')
                     if dtype is not None:
                         alter = AlterColumnTypeDesc(expression, alter_column)
                         self.parse_result.append_alter_column_type(alter)
                     elif drop is not None:
                         desc = DropColumnDesc(expression, alter_column)
                         self.parse_result.append_drop_column_default(desc)
+                    elif options is not None:
+                        for option in options:
+                            if isinstance(option, SetConfigProperty):
+                                # ignore ALTER TABLE a_table ALTER COLUMN a_type SET NOT NULL;
+                                pass
+                            else:
+                                self.parse_result.append_cant_parse(sqlWrapper.sql)
                     else:
                         self.parse_result.append_cant_parse(sqlWrapper.sql)
                 elif isinstance(action, Drop):
