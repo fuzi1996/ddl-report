@@ -19,6 +19,10 @@ class CreateHandler(ExpressionHandler):
                 self.parse_result.append_add_index(index)
             else:
                 desc = CreateTableDesc(expression)
-                self.parse_result.append_create_table(desc)
+                if len(desc.columns) > 0:
+                    self.parse_result.append_create_table(desc)
+                else:
+                    # create table as select 忽略
+                    pass
         else:
             self.parse_result.append_cant_parse(sqlWrapper.sql)

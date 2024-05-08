@@ -64,6 +64,11 @@ class Parser:
                     self._comment_handler.del_expression(wrapper)
                 elif isinstance(expression, sqlglot.expressions.Create):
                     self._create_handler.del_expression(wrapper)
+                elif (isinstance(expression, Delete)
+                      or isinstance(expression, Update)
+                      or isinstance(expression, Select)
+                      or isinstance(expression, Insert)):
+                    pass
                 else:
                     self._parse_result.append_cant_parse(sql_str)
 

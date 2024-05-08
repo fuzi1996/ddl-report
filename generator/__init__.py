@@ -16,4 +16,4 @@ class Generate:
         generators.append(ViewChange(pase_result))
         generators.append(CantParse(pase_result))
 
-        return "".join([generator.generate() for generator in generators])
+        return "\n\n".join([generator.generate().strip() for generator in generators])
