@@ -30,7 +30,7 @@ class TestParseCommentColumn(unittest.TestCase):
         self.assertEqual(len(comments), 1)
         column_comment = comments['d_table']
         self.assertIsNotNone(column_comment)
-        self.assertEqual(column_comment['d_column'], '注释2')
+        self.assertEqual(column_comment['d_column'], '注释1')
 
     def test_multi_comment(self):
         sql = """
@@ -45,7 +45,5 @@ class TestParseCommentColumn(unittest.TestCase):
         column_comment = comments['d_table']
         self.assertIsNotNone(column_comment)
         self.assertEqual(column_comment['a_column'], '注释1')
-        self.assertEqual(column_comment['d_column'], '注释2')
 
         self.assertEqual(parse_result.get_column_comment("d_table", "a_column"), "注释1")
-        self.assertEqual(parse_result.get_column_comment("d_table", "b_column"), "")

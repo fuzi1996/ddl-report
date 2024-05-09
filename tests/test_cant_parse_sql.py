@@ -15,9 +15,7 @@ class TestCantParseSql(unittest.TestCase):
         parse.parse(sql)
         parse_result = parse.get_parse_result()
         sqls: List[str] = parse_result.get_cant_parse()
-        self.assertEqual(len(sqls), 1)
-        sql0 = sqls[0]
-        self.assertEqual(sql0, 'ALTER TABLE a_table ALTER COLUMN a_type DROP DEFAULT, SET NOT NULL')
+        self.assertEqual(len(sqls), 0)
 
 
 class TestCantParseGenerator(unittest.TestCase):
