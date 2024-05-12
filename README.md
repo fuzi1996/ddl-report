@@ -27,7 +27,7 @@ pyinstaller -F .\ddl_report.py
 ./ddl_report.exe './db'
 ```
 
-# 获取帮助
+## 获取帮助
 
 ```bash
 ./ddl_report.exe -h
