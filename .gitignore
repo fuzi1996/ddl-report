@@ -9,3 +9,5 @@ ddl_report.spec
 dist
 
 build
+
+ddl_report.egg-info
