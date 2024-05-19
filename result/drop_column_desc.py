@@ -1,8 +1,4 @@
-import logging
-
 from sqlglot.expressions import *
-
-log = logging.getLogger(__name__)
 
 
 class DropColumnDesc:

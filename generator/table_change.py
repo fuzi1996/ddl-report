@@ -28,7 +28,7 @@ class TableChange(BaseGenerator):
         """
 
     def generate_create_index(self) -> str:
-        indexs = self.parse_result.get_add_index()
+        indexs = self.parse_result.get_add_indexs()
         if len(indexs) > 0:
             index_desc = []
             for index in indexs:
@@ -65,13 +65,13 @@ class TableChange(BaseGenerator):
 
         return f"""## 数据表
 
-### 新建表
-
-{create_table}
-
 ### 删除表
 
 {drop_table}
+
+### 新建表
+
+{create_table}
 
 ### 新建索引
 

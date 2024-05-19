@@ -1,5 +1,3 @@
-import logging
-
 import sqlglot
 from sqlglot.expressions import *
 
@@ -7,11 +5,12 @@ import dialect.postgres
 import handler.alter_table
 from handler.comment_handler import CommentHandler
 from handler.create_handler import CreateHandler
-from handler.drop_table import DropTable
+from handler.drop_handler import DropTableOrView
+from log.log import get_logger
 from result.result import ParseResult
 from result.sql_wrapper import SqlWrapper
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 
 class Parser:
@@ -19,7 +18,7 @@ class Parser:
         self.debug = opts.get('debug', False)
         self._parse_result = ParseResult()
         self._create_handler = CreateHandler(self._parse_result)
-        self._drop_table = DropTable(self._parse_result)
+        self._drop_table = DropTableOrView(self._parse_result)
         self._alter_table = handler.alter_table.AlterTable(self._parse_result)
         self._comment_handler = handler.comment_handler.CommentHandler(self._parse_result)
 
@@ -54,7 +53,7 @@ class Parser:
 
             if expression is not None:
                 if self.debug:
-                    print(repr(expression))
+                    log.info(repr(expression))
 
                 if isinstance(expression, Drop):
                     self._drop_table.del_expression(wrapper)

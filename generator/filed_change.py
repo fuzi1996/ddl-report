@@ -80,13 +80,13 @@ class FiledChange(BaseGenerator):
         return f"""
 ## 字段
 
-### 字段新增
-
-{add_columns}
-
 ### 字段删除
 
 {drop_columns}
+
+### 字段新增
+
+{add_columns}
 
 ### 字段重命名
 

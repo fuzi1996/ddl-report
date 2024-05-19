@@ -12,7 +12,7 @@ class TestParseCreateIndex(unittest.TestCase):
         parse = Parser()
         parse.parse(sql)
         parse_result = parse.get_parse_result()
-        indexs = parse_result.get_add_index()
+        indexs = parse_result.get_add_indexs()
         self.assertEqual(len(indexs), 1)
         index = indexs[0]
         self.assertEqual(index.table, "a_table")
@@ -28,7 +28,7 @@ class TestParseCreateIndex(unittest.TestCase):
         parse = Parser()
         parse.parse(sql)
         parse_result = parse.get_parse_result()
-        indexs = parse_result.get_add_index()
+        indexs = parse_result.get_add_indexs()
         self.assertEqual(len(indexs), 1)
         index = indexs[0]
         self.assertEqual(index.table, "a_table")

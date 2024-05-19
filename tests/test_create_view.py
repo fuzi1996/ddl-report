@@ -14,7 +14,7 @@ class TestParseCreateTable(unittest.TestCase):
         parse = Parser()
         parse.parse(sql)
         parse_result = parse.get_parse_result()
-        views: List[str] = parse_result.get_create_view()
+        views: List[str] = parse_result.get_create_views()
         self.assertEqual(len(views), 1)
 
         view = views[0]

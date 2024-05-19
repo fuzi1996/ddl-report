@@ -1,6 +1,6 @@
-import logging
 from typing import List, Dict
 
+from log.log import get_logger
 from result.add_column_desc import AddColumnDesc
 from result.alter_column_type_desc import AlterColumnTypeDesc
 from result.create_table_desc import CreateTableDesc
@@ -8,14 +8,18 @@ from result.drop_column_default_desc import DropColumnDefaultDesc
 from result.drop_column_desc import DropColumnDesc
 from result.index_desc import IndexDesc
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 
 class ParseResult:
     def __init__(self):
         self._create_tables: List[CreateTableDesc] = []
 
-        self._create_view: List[str] = []
+        self._drop_views: List[str] = []
+
+        self._create_views: List[str] = []
+
+        self._update_views: List[str] = []
 
         # 元素中每一项都是drop的表名
         self._drop_tables: List[str] = []
@@ -66,8 +70,14 @@ class ParseResult:
     def get_create_tables(self) -> List[CreateTableDesc]:
         return self._create_tables
 
-    def get_create_view(self) -> List[str]:
-        return self._create_view
+    def get_create_views(self) -> List[str]:
+        return self._create_views
+
+    def get_update_views(self) -> List[str]:
+        return self._update_views
+
+    def get_drop_views(self) -> List[str]:
+        return self._drop_views
 
     def get_drop_tables(self) -> List[str]:
         return self._drop_tables
@@ -75,7 +85,7 @@ class ParseResult:
     def get_cant_parse(self) -> List[str]:
         return self._cant_parse
 
-    def get_add_index(self) -> List[IndexDesc]:
+    def get_add_indexs(self) -> List[IndexDesc]:
         return self._add_indexs
 
     def get_alter_column_types(self) -> List[AlterColumnTypeDesc]:
@@ -116,18 +126,56 @@ class ParseResult:
         self._create_tables.append(desc)
 
     def append_create_view(self, view: str):
-        for inner in self._create_view:
+        for inner in self._create_views:
             if inner.__eq__(view):
                 log.warning(f"视图 {view} 定义重复")
-        self._create_view.append(view)
+        self._create_views.append(view)
 
-    def append_cant_parse(self, sql):
-        if sql not in self._cant_parse:
-            self._cant_parse.append(sql)
+    def is_view_created(self, view: str) -> bool:
+        return view in self._create_views
+
+    def clean_view_created_record(self, view: str):
+        if view in self._create_views:
+            self._create_views.remove(view)
+        else:
+            raise Exception(f'view {view} is not in created list,could not clean created record')
+
+    def append_update_view(self, view: str):
+        if view not in self._update_views:
+            self._update_views.append(view)
+
+    def is_view_updated(self, view: str) -> bool:
+        return view in self._update_views
+
+    def clean_view_updated_record(self, view: str):
+        if view in self._update_views:
+            self._update_views.remove(view)
+        else:
+            raise Exception(f'view {view} is not in updated list,could not clean updated record')
+
+    def append_drop_view(self, view_name: str):
+        if view_name not in self._drop_views:
+            self._drop_views.append(view_name)
+
+    def is_view_droped(self, view_name: str) -> bool:
+        return view_name in self._drop_views
+
+    def clean_view_droped_record(self, view_name: str):
+        if view_name in self._drop_views:
+            self._drop_views.remove(view_name)
+        else:
+            raise Exception(f'view {view_name} is not in droped list,could not clean droped record')
 
     def append_drop_table(self, table_name: str):
         if table_name not in self._drop_tables:
             self._drop_tables.append(table_name)
+
+    def is_table_droped(self, table_name: str) -> bool:
+        return table_name in self._drop_tables
+
+    def append_cant_parse(self, sql):
+        if sql not in self._cant_parse:
+            self._cant_parse.append(sql)
 
     def append_add_index(self, index: IndexDesc):
         name = index.name

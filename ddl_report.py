@@ -5,12 +5,14 @@ ALTER TABLE a_table ALTER COLUMN a_type SET NOT NULL;
 """
 import argparse
 import glob
+import logging
 import os.path
 from typing import List
 
 from natsort import natsorted
 
 from generator import Generate
+from log.log import config_logging
 from parse.parser import Parser
 from result.sql_wrapper import SqlWrapper
 
@@ -33,6 +35,10 @@ def read_sql_file(list: List[SqlWrapper], filepath: str):
 
 
 if __name__ == '__main__':
+
+    handlers = [logging.FileHandler(filename="ddl_report.log", mode="a", encoding="utf-8")]
+    config_logging(logging.INFO, handlers=handlers)
+
     arg_parser = argparse.ArgumentParser(prog='DDL Report', description='解析SQL DDL,生成数据结构变动报告')
     arg_parser.add_argument('dir_path', help='sql文件所在目录,支持解析深层目录')
     arg_parser.add_argument('-o', '--output', default='数据结构变动.md', help='输出文件位置')
