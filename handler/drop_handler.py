@@ -26,6 +26,9 @@ class DropTableOrView(ExpressionHandler):
         if self.parse_result.is_view_created(view_name):
             self.parse_result.clean_view_created_record(view_name)
             log.info(f"视图 {view_name} 先建后删,互相抵消")
+        elif self.parse_result.is_view_updated(view_name):
+            self.parse_result.clean_view_updated_record(view_name)
+            log.info(f"视图 {view_name} 先更新后删,互相抵消")
         else:
             # 之前没有创建过,添加删除记录
             self.parse_result.append_drop_view(view_name)

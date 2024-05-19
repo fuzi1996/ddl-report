@@ -26,7 +26,7 @@ class CreateHandler(ExpressionHandler):
                 if len(desc.columns) > 0:
                     self.parse_result.append_create_table(desc)
                 else:
-                    # create table as select 忽略
+                    # create table as select 备份表忽略
                     pass
         else:
             self.parse_result.append_cant_parse(sqlWrapper.sql)
@@ -34,6 +34,8 @@ class CreateHandler(ExpressionHandler):
     def _del_create_view(self, view_name: str) -> None:
         if self.parse_result.is_view_droped(view_name):
             self.parse_result.clean_view_droped_record(view_name)
-            log.info(f"视图 {view_name} 先删除后创建,互相抵消")
+            log.info(f"视图 {view_name} 先删除后创建,互相抵消,视为试图更新")
+            # 试图更新
+            self.parse_result.append_update_view(view_name)
         else:
             self.parse_result.append_create_view(view_name)

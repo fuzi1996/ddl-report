@@ -13,6 +13,11 @@ class ViewChange(BaseGenerator):
         if len(drop_views) > 0:
             drop_view_result = "\n".join([f"- {view}" for view in drop_views])
 
+        update_views = self.parse_result.get_update_views()
+        update_view_result = "无"
+        if len(update_views) > 0:
+            update_view_result = "\n".join([f"- {view}" for view in update_views])
+
         return f"""
 ## 视图
 
@@ -23,4 +28,8 @@ class ViewChange(BaseGenerator):
 ### 新增视图
 
 {create_view_result}
+
+### 更新视图
+
+{update_view_result}
     """

@@ -34,6 +34,10 @@ class TestParseViewChange(unittest.TestCase):
         create_views = parse_result.get_create_views()
         self.assertEqual(len(create_views), 0)
 
+        update_views = parse_result.get_update_views()
+        self.assertEqual(len(update_views), 1)
+        self.assertEqual(update_views[0], 'v_view')
+
     # 先建后删,互相抵消
     def test_drop_and_create2(self):
         parse = Parser()
@@ -44,8 +48,7 @@ class TestParseViewChange(unittest.TestCase):
         parse_result = parse.get_parse_result()
 
         drop_views = parse_result.get_drop_views()
-        self.assertEqual(len(drop_views), 1)
-        self.assertEqual(drop_views[0], 'v_view')
+        self.assertEqual(len(drop_views), 0)
 
         create_views = parse_result.get_create_views()
         self.assertEqual(len(create_views), 0)
@@ -58,5 +61,13 @@ class TestViewChangeGenerate(unittest.TestCase):
         """
         parse = Parser()
         parse.parse(sql)
+        parse_result = parse.get_parse_result()
+        print(Generate.generate(parse_result))
+
+    def test_drop_and_create(self):
+        parse = Parser()
+        parse.parse("drop view v_view")
+        parse.parse("create view v_view as (select * from a_table)")
+
         parse_result = parse.get_parse_result()
         print(Generate.generate(parse_result))

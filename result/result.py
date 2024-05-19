@@ -142,7 +142,7 @@ class ParseResult:
 
     def append_update_view(self, view: str):
         if view not in self._update_views:
-            self.append_update_view(view)
+            self._update_views.append(view)
 
     def is_view_updated(self, view: str) -> bool:
         return view in self._update_views
