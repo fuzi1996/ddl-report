@@ -11,3 +11,7 @@ dist
 build
 
 ddl_report.egg-info
+
+ddl_report.log
+
+数据结构变动.md

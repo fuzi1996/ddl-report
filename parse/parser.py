@@ -1,5 +1,3 @@
-import logging
-
 import sqlglot
 from sqlglot.expressions import *
 
@@ -8,16 +6,11 @@ import handler.alter_table
 from handler.comment_handler import CommentHandler
 from handler.create_handler import CreateHandler
 from handler.drop_handler import DropTableOrView
+from log.log import get_logger
 from result.result import ParseResult
 from result.sql_wrapper import SqlWrapper
 
-LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(pathname)s %(message)s "  # 配置输出日志格式
-DATE_FORMAT = '%Y-%m-%d  %H:%M:%S %a '  # 配置输出时间的格式，注意月份和天数不要搞乱了
-
-logging.basicConfig(level=logging.DEBUG,
-                    format=LOG_FORMAT,
-                    datefmt=DATE_FORMAT,
-                    filename=r"./parse.log")
+log = get_logger(__name__)
 
 
 class Parser:
@@ -60,7 +53,7 @@ class Parser:
 
             if expression is not None:
                 if self.debug:
-                    print(repr(expression))
+                    log.info(repr(expression))
 
                 if isinstance(expression, Drop):
                     self._drop_table.del_expression(wrapper)
