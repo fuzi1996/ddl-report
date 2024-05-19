@@ -28,7 +28,7 @@ class TableChange(BaseGenerator):
         """
 
     def generate_create_index(self) -> str:
-        indexs = self.parse_result.get_add_index()
+        indexs = self.parse_result.get_add_indexs()
         if len(indexs) > 0:
             index_desc = []
             for index in indexs:

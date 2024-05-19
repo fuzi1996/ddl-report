@@ -10,7 +10,7 @@ class TestParseAddConstraint(unittest.TestCase):
         parse = Parser()
         parse.parse(sql)
         parse_result = parse.get_parse_result()
-        constraints = parse_result.get_add_index()
+        constraints = parse_result.get_add_indexs()
         self.assertEqual(len(constraints), 1)
         constraint = constraints[0]
         self.assertEqual(constraint.name, "persons_pk")
@@ -28,7 +28,7 @@ class TestParseAddConstraint(unittest.TestCase):
         parse = Parser()
         parse.parse(sql)
         parse_result = parse.get_parse_result()
-        constraints = parse_result.get_add_index()
+        constraints = parse_result.get_add_indexs()
         self.assertEqual(len(constraints), 1)
         constraint = constraints[0]
         self.assertEqual(constraint.name, "persons_pk")
@@ -44,7 +44,7 @@ class TestParseAddConstraint(unittest.TestCase):
         parse = Parser()
         parse.parse(sql)
         parse_result = parse.get_parse_result()
-        constraints = parse_result.get_add_index()
+        constraints = parse_result.get_add_indexs()
         self.assertEqual(len(constraints), 1)
         constraint = constraints[0]
         self.assertEqual(constraint.name, "risk_uk")

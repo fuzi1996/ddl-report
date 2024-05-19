@@ -15,7 +15,9 @@ class ParseResult:
     def __init__(self):
         self._create_tables: List[CreateTableDesc] = []
 
-        self._create_view: List[str] = []
+        self._drop_views: List[str] = []
+
+        self._create_views: List[str] = []
 
         # 元素中每一项都是drop的表名
         self._drop_tables: List[str] = []
@@ -66,8 +68,11 @@ class ParseResult:
     def get_create_tables(self) -> List[CreateTableDesc]:
         return self._create_tables
 
-    def get_create_view(self) -> List[str]:
-        return self._create_view
+    def get_create_views(self) -> List[str]:
+        return self._create_views
+
+    def get_drop_views(self) -> List[str]:
+        return self._drop_views
 
     def get_drop_tables(self) -> List[str]:
         return self._drop_tables
@@ -75,7 +80,7 @@ class ParseResult:
     def get_cant_parse(self) -> List[str]:
         return self._cant_parse
 
-    def get_add_index(self) -> List[IndexDesc]:
+    def get_add_indexs(self) -> List[IndexDesc]:
         return self._add_indexs
 
     def get_alter_column_types(self) -> List[AlterColumnTypeDesc]:
@@ -116,14 +121,18 @@ class ParseResult:
         self._create_tables.append(desc)
 
     def append_create_view(self, view: str):
-        for inner in self._create_view:
+        for inner in self._create_views:
             if inner.__eq__(view):
                 log.warning(f"视图 {view} 定义重复")
-        self._create_view.append(view)
+        self._create_views.append(view)
 
     def append_cant_parse(self, sql):
         if sql not in self._cant_parse:
             self._cant_parse.append(sql)
+
+    def append_drop_view(self, view_name: str):
+        if view_name not in self._drop_views:
+            self._drop_views.append(view_name)
 
     def append_drop_table(self, table_name: str):
         if table_name not in self._drop_tables:

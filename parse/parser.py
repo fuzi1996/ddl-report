@@ -7,7 +7,7 @@ import dialect.postgres
 import handler.alter_table
 from handler.comment_handler import CommentHandler
 from handler.create_handler import CreateHandler
-from handler.drop_table import DropTable
+from handler.drop_table_or_view_handler import DropTableOrView
 from result.result import ParseResult
 from result.sql_wrapper import SqlWrapper
 
@@ -19,7 +19,7 @@ class Parser:
         self.debug = opts.get('debug', False)
         self._parse_result = ParseResult()
         self._create_handler = CreateHandler(self._parse_result)
-        self._drop_table = DropTable(self._parse_result)
+        self._drop_table = DropTableOrView(self._parse_result)
         self._alter_table = handler.alter_table.AlterTable(self._parse_result)
         self._comment_handler = handler.comment_handler.CommentHandler(self._parse_result)
 
