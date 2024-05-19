@@ -65,13 +65,13 @@ class TableChange(BaseGenerator):
 
         return f"""## 数据表
 
-### 新建表
-
-{create_table}
-
 ### 删除表
 
 {drop_table}
+
+### 新建表
+
+{create_table}
 
 ### 新建索引
 
