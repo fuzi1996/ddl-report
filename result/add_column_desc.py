@@ -1,8 +1,8 @@
-import logging
-
 from sqlglot.expressions import *
 
-log = logging.getLogger(__name__)
+from log.log import get_logger
+
+log = get_logger(__name__)
 
 
 class AddColumnDesc():

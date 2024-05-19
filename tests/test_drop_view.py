@@ -4,7 +4,7 @@ from generator import Generate
 from parse.parser import Parser
 
 
-class TestParseDropTable(unittest.TestCase):
+class TestParseDropView(unittest.TestCase):
     def test(self):
         table_name = "a1"
         sql = f"drop view {table_name};"
@@ -18,7 +18,7 @@ class TestParseDropTable(unittest.TestCase):
         self.assertEqual(drop_views[0], table_name)
 
 
-class TestDropTableGenerate(unittest.TestCase):
+class TestDropViewGenerate(unittest.TestCase):
     def test_drop_table(self):
         sql = """
             DROP view table_1;

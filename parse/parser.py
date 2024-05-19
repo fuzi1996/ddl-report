@@ -7,11 +7,17 @@ import dialect.postgres
 import handler.alter_table
 from handler.comment_handler import CommentHandler
 from handler.create_handler import CreateHandler
-from handler.drop_table_or_view_handler import DropTableOrView
+from handler.drop_handler import DropTableOrView
 from result.result import ParseResult
 from result.sql_wrapper import SqlWrapper
 
-log = logging.getLogger(__name__)
+LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(pathname)s %(message)s "  # 配置输出日志格式
+DATE_FORMAT = '%Y-%m-%d  %H:%M:%S %a '  # 配置输出时间的格式，注意月份和天数不要搞乱了
+
+logging.basicConfig(level=logging.DEBUG,
+                    format=LOG_FORMAT,
+                    datefmt=DATE_FORMAT,
+                    filename=r"./parse.log")
 
 
 class Parser:

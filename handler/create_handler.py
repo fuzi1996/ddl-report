@@ -1,9 +1,12 @@
 from sqlglot.expressions import *
 
 from handler.expression_handler import ExpressionHandler
+from log.log import get_logger
 from result.create_table_desc import CreateTableDesc
 from result.index_desc import IndexDescWrap
 from result.sql_wrapper import SqlWrapper
+
+log = get_logger(__name__)
 
 
 class CreateHandler(ExpressionHandler):
@@ -13,7 +16,8 @@ class CreateHandler(ExpressionHandler):
         if not isinstance(expression, Select):
             if expression.kind.__eq__("VIEW"):
                 identifier = expression.find(Identifier)
-                self.parse_result.append_create_view(identifier.name)
+                view_name = identifier.name
+                self._del_create_view(view_name)
             elif expression.kind.__eq__("INDEX"):
                 index = IndexDescWrap.parse(expression)
                 self.parse_result.append_add_index(index)
@@ -26,3 +30,10 @@ class CreateHandler(ExpressionHandler):
                     pass
         else:
             self.parse_result.append_cant_parse(sqlWrapper.sql)
+
+    def _del_create_view(self, view_name: str) -> None:
+        if self.parse_result.is_view_droped(view_name):
+            self.parse_result.clean_view_droped_record(view_name)
+            log.info(f"视图 {view_name} 先删除后创建,互相抵消")
+        else:
+            self.parse_result.append_create_view(view_name)
