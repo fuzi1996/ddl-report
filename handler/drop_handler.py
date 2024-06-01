@@ -15,7 +15,7 @@ class DropTableOrView(ExpressionHandler):
         table = expression.find(Table)
         if table is not None:
             kind: str = expression.args.get('kind')
-            if 'view'.__eq__(kind):
+            if 'view'.__eq__(kind.lower()):
                 self._del_drop_view(table.name)
             else:
                 self.parse_result.append_drop_table(table.name)

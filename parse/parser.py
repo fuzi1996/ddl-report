@@ -47,6 +47,7 @@ class Parser:
                 log.debug(
                     f"正在解析 {wrapper.file_name} 文件中 {sql_str}" if wrapper.file_name else f"正在解析 {sql_str}")
 
+            # expression = sqlglot.parse_one(sql_str, dialect='postgres')
             expression = sqlglot.parse_one(sql_str, dialect=dialect.postgres.Postgres)
 
             wrapper.set_expression(expression)

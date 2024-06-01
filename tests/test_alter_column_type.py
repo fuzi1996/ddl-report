@@ -34,7 +34,7 @@ class TestParseAlterColumnType(unittest.TestCase):
         alter = alters[0]
         self.assertEqual(alter.table, 'b_table')
         self.assertEqual(alter.column, 'b_column')
-        self.assertEqual(alter.type, 'TEXT')
+        self.assertEqual(alter.type, 'text')
 
 
 class TestAlterColumnTypeGenerator(unittest.TestCase):

@@ -28,15 +28,15 @@ class IndexDescWrap:
         index = IndexDesc()
         indexExpr = expression.find(Index)
         table = indexExpr.find(Table)
-        index.name = indexExpr.name
-        index.table = table.name
+        index.name = indexExpr.name.lower()
+        index.table = table.name.lower()
         index.is_pk = False
         index.is_unique = expression.args.get("unique") or False
         index.expression = expression
 
         indexParameters = expression.find(IndexParameters)
         for column in indexParameters.find_all(Column):
-            index.columns.append(column.name)
+            index.columns.append(column.name.lower())
 
         return index
 
@@ -54,9 +54,9 @@ class ConstraintDesc:
 
         index = IndexDesc()
         # 约束名称
-        index.name = constraint.name
+        index.name = constraint.name.lower()
         # 所属表
-        index.table = table.name
+        index.table = table.name.lower()
         # 是否主键
         index.is_pk = primary_key is not None
         # 是否唯一索引
@@ -65,9 +65,9 @@ class ConstraintDesc:
         index.expression = expression
         # 涉及字段
         if index.is_pk:
-            index.columns = [field.sql() for field in primary_key.expressions]
+            index.columns = [field.sql().lower() for field in primary_key.expressions]
         elif index.is_unique:
-            index.columns = [field.sql() for field in
+            index.columns = [field.sql().lower() for field in
                              unique_column_constraint.find_all(Identifier)]
         else:
             raise Exception("Unexpected constraint")

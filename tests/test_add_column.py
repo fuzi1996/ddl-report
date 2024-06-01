@@ -20,7 +20,7 @@ class TestParseAddColumn(unittest.TestCase):
         add_column = add_columns[0]
         self.assertEqual(add_column.table, 'a_table')
         self.assertEqual(add_column.column, 'a_column')
-        self.assertEqual(add_column.type, 'VARCHAR(200)')
+        self.assertEqual(add_column.type, 'varchar(200)')
 
 
 class TestCreateTableGenerator(unittest.TestCase):

@@ -10,10 +10,9 @@ class FiledChange(BaseGenerator):
 
     def generate_add_columns(self) -> str:
         columns: List[AddColumnDesc] = self.parse_result.get_add_columns()
-
         if len(columns) > 0:
             column_descs = []
-            for column in columns:
+            for column in self.sort_list(columns, "table", "column"):
                 table_name = column.table
                 column_name = column.column
                 column_type = column.type
@@ -31,7 +30,8 @@ class FiledChange(BaseGenerator):
         drop_columns: List[DropColumnDesc] = self.parse_result.get_drop_columns()
         if len(drop_columns) > 0:
             drop_column_str = '\n'.join(
-                [f'| {drop_column.table} | {drop_column.column} |' for drop_column in drop_columns])
+                [f'| {drop_column.table} | {drop_column.column} |' for drop_column in
+                 self.sort_list(drop_columns, "table", "column")])
             return f"""| 表 | 字段 | 备注 |
 | --- | --- | --- |
 {drop_column_str}
@@ -43,7 +43,7 @@ class FiledChange(BaseGenerator):
         alter_column_types: List[AlterColumnTypeDesc] = self.parse_result.get_alter_column_types()
         if len(alter_column_types) > 0:
             alter_column_type_strs = []
-            for alter_column_type in alter_column_types:
+            for alter_column_type in self.sort_list(alter_column_types, "table", "column"):
                 table_name = alter_column_type.table
                 column_name = alter_column_type.column
                 column_type = alter_column_type.type
@@ -58,10 +58,12 @@ class FiledChange(BaseGenerator):
 
     def generate_rename_column(self) -> str:
         rename_columns: Dict[str, Dict[str, str]] = self.parse_result.get_rename_columns()
+
         if len(rename_columns) > 0:
             rename_column_type_strs = []
-            for table, rename_columns in rename_columns.items():
-                for old_column, new_column in rename_columns.items():
+
+            for table, rename_columns in self.sort_dict(rename_columns).items():
+                for old_column, new_column in self.sort_dict(rename_columns).items():
                     rename_column_type_strs.append(f"| {table} | {old_column} | {new_column} |")
             result = "\n".join(rename_column_type_strs)
             return f"""| 表 | 原字段 | 修改后新字段 |

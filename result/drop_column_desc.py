@@ -7,6 +7,6 @@ class DropColumnDesc:
         drop_column = action.find(Identifier)
 
         # 所属表
-        self.table = table.name
+        self.table = table.name.lower()
         # 字段
-        self.column = drop_column.name
+        self.column = drop_column.name.lower()

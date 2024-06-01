@@ -126,54 +126,66 @@ class ParseResult:
         self._create_tables.append(desc)
 
     def append_create_view(self, view: str):
+        view = view.lower()
         for inner in self._create_views:
             if inner.__eq__(view):
                 log.warning(f"视图 {view} 定义重复")
         self._create_views.append(view)
 
     def is_view_created(self, view: str) -> bool:
+        view = view.lower()
         return view in self._create_views
 
     def clean_view_created_record(self, view: str):
+        view = view.lower()
         if view in self._create_views:
             self._create_views.remove(view)
         else:
             raise Exception(f'view {view} is not in created list,could not clean created record')
 
     def append_update_view(self, view: str):
+        view = view.lower()
         if view not in self._update_views:
             self._update_views.append(view)
 
     def is_view_updated(self, view: str) -> bool:
+        view = view.lower()
         return view in self._update_views
 
     def clean_view_updated_record(self, view: str):
+        view = view.lower()
         if view in self._update_views:
             self._update_views.remove(view)
         else:
             raise Exception(f'view {view} is not in updated list,could not clean updated record')
 
     def append_drop_view(self, view_name: str):
+        view_name = view_name.lower()
         if view_name not in self._drop_views:
             self._drop_views.append(view_name)
 
     def is_view_droped(self, view_name: str) -> bool:
+        view_name = view_name.lower()
         return view_name in self._drop_views
 
     def clean_view_droped_record(self, view_name: str):
+        view_name = view_name.lower()
         if view_name in self._drop_views:
             self._drop_views.remove(view_name)
         else:
             raise Exception(f'view {view_name} is not in droped list,could not clean droped record')
 
     def append_drop_table(self, table_name: str):
+        table_name = table_name.lower()
         if table_name not in self._drop_tables:
             self._drop_tables.append(table_name)
 
     def is_table_droped(self, table_name: str) -> bool:
+        table_name = table_name.lower()
         return table_name in self._drop_tables
 
     def append_cant_parse(self, sql):
+        sql = sql.lower()
         if sql not in self._cant_parse:
             self._cant_parse.append(sql)
 
@@ -221,7 +233,11 @@ sql2: {index.expression.sql()}""")
                     f"表 {table} 下字段 {column} 新增重复\nsql1: {inner_add_column.expression.sql()}\nsql2: {add_column.expression.sql()}")
         self._add_columns.append(add_column)
 
-    def append_column_comment(self, table, column, comment):
+    def append_column_comment(self, table: str, column: str, comment: str):
+        table = table.lower()
+        column = column.lower()
+        comment = comment.lower()
+
         table_dict = self._column_comments.get(table)
         if table_dict is None:
             self._column_comments[table] = {
@@ -235,10 +251,14 @@ sql2: {index.expression.sql()}""")
             table_dict[column] = comment
 
     def put_table_column(self, table, comment):
+        table = table.lower()
+        comment = comment.lower()
         table_comment = self._table_comments.get(table)
+
         if table_comment is None:
             self._table_comments[table] = comment
         else:
+            table_comment = table_comment.lower()
             if not table_comment.__eq__(comment):
                 log.warning(f"表 {table} 注释定义重复 {table_comment} -> {comment}")
             self._table_comments[table] = comment
@@ -251,7 +271,11 @@ sql2: {index.expression.sql()}""")
                 log.warning(f"表 {table} 字段 {column} 删除重复")
         self._drop_column_defaults.append(desc)
 
-    def append_rename_column(self, table, old_column, new_column):
+    def append_rename_column(self, table: str, old_column: str, new_column: str):
+        table = table.lower()
+        old_column = old_column.lower()
+        new_column = new_column.lower()
+
         table_dict = self._rename_columns.get(table)
         if table_dict is None:
             self._rename_columns[table] = {

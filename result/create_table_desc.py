@@ -9,8 +9,8 @@ log = get_logger(__name__)
 
 class ColumnDesc:
     def __init__(self, column, type):
-        self.column = column
-        self.type = type
+        self.column = column.lower()
+        self.type = type.lower()
 
 
 class CreateTableDesc():
@@ -18,7 +18,7 @@ class CreateTableDesc():
         table = expression.find(Table)
 
         # 所属表
-        self.table = table.name
+        self.table = table.name.lower()
         # 字段
         self.columns: List[ColumnDesc] = []
 

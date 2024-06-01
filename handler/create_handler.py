@@ -14,11 +14,12 @@ class CreateHandler(ExpressionHandler):
     def del_expression(self, sqlWrapper: SqlWrapper) -> None:
         expression = sqlWrapper.expression
         if not isinstance(expression, Select):
-            if expression.kind.__eq__("VIEW"):
+            upper_kind: str = expression.kind.upper()
+            if upper_kind.__eq__("VIEW"):
                 identifier = expression.find(Identifier)
                 view_name = identifier.name
                 self._del_create_view(view_name)
-            elif expression.kind.__eq__("INDEX"):
+            elif upper_kind.__eq__("INDEX"):
                 index = IndexDescWrap.parse(expression)
                 self.parse_result.append_add_index(index)
             else:

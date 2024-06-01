@@ -32,7 +32,7 @@ from sqlglot.dialects.dialect import (
     trim_sql,
     ts_or_ds_add_cast,
 )
-from sqlglot.helper import seq_get
+from sqlglot.helper import is_int, seq_get
 from sqlglot.parser import binary_range_parser
 from sqlglot.tokens import TokenType
 
@@ -116,7 +116,10 @@ def _string_agg_sql(self: Postgres.Generator, expression: exp.GroupConcat) -> st
 
 def _datatype_sql(self: Postgres.Generator, expression: exp.DataType) -> str:
     if expression.is_type("array"):
-        return f"{self.expressions(expression, flat=True)}[]" if expression.expressions else "ARRAY"
+        if expression.expressions:
+            values = self.expressions(expression, key="values", flat=True)
+            return f"{self.expressions(expression, flat=True)}[{values}]"
+        return "ARRAY"
     return self.datatype_sql(expression)
 
 
@@ -204,12 +207,50 @@ def _json_extract_sql(
     return _generate
 
 
+def _build_regexp_replace(args: t.List) -> exp.RegexpReplace:
+    # The signature of REGEXP_REPLACE is:
+    # regexp_replace(source, pattern, replacement [, start [, N ]] [, flags ])
+    #
+    # Any one of `start`, `N` and `flags` can be column references, meaning that
+    # unless we can statically see that the last argument is a non-integer string
+    # (eg. not '0'), then it's not possible to construct the correct AST
+    if len(args) > 3:
+        last = args[-1]
+        if not is_int(last.name):
+            if not last.type or last.is_type(exp.DataType.Type.UNKNOWN, exp.DataType.Type.NULL):
+                from sqlglot.optimizer.annotate_types import annotate_types
+
+                last = annotate_types(last)
+
+            if last.is_type(*exp.DataType.TEXT_TYPES):
+                regexp_replace = exp.RegexpReplace.from_arg_list(args[:-1])
+                regexp_replace.set("modifiers", last)
+                return regexp_replace
+
+    return exp.RegexpReplace.from_arg_list(args)
+
+
+def _unix_to_time_sql(self: Postgres.Generator, expression: exp.UnixToTime) -> str:
+    scale = expression.args.get("scale")
+    timestamp = expression.this
+
+    if scale in (None, exp.UnixToTime.SECONDS):
+        return self.func("TO_TIMESTAMP", timestamp, self.format_time(expression))
+
+    return self.func(
+        "TO_TIMESTAMP",
+        exp.Div(this=timestamp, expression=exp.func("POW", 10, scale)),
+        self.format_time(expression),
+    )
+
+
 class Postgres(Dialect):
     INDEX_OFFSET = 1
     TYPED_DIVISION = True
     CONCAT_COALESCE = True
     NULL_ORDERING = "nulls_are_large"
     TIME_FORMAT = "'YYYY-MM-DD HH24:MI:SS'"
+    TABLESAMPLE_SIZE_IS_PERCENT = True
 
     TIME_MAPPING = {
         "AM": "%p",
@@ -266,24 +307,24 @@ class Postgres(Dialect):
             "BIGSERIAL": TokenType.BIGSERIAL,
             "CHARACTER VARYING": TokenType.VARCHAR,
             "CONSTRAINT TRIGGER": TokenType.COMMAND,
+            "CSTRING": TokenType.PSEUDO_TYPE,
             "DECLARE": TokenType.COMMAND,
             "DO": TokenType.COMMAND,
             "EXEC": TokenType.COMMAND,
             "HSTORE": TokenType.HSTORE,
-            "JSONB": TokenType.JSONB,
+            "INT8": TokenType.BIGINT,
             "MONEY": TokenType.MONEY,
+            "NAME": TokenType.NAME,
+            "OID": TokenType.OBJECT_IDENTIFIER,
+            "ONLY": TokenType.ONLY,
+            "OPERATOR": TokenType.OPERATOR,
             "REFRESH": TokenType.COMMAND,
             "REINDEX": TokenType.COMMAND,
             "RESET": TokenType.COMMAND,
             "REVOKE": TokenType.COMMAND,
             "SERIAL": TokenType.SERIAL,
             "SMALLSERIAL": TokenType.SMALLSERIAL,
-            "NAME": TokenType.NAME,
             "TEMP": TokenType.TEMPORARY,
-            "CSTRING": TokenType.PSEUDO_TYPE,
-            "OID": TokenType.OBJECT_IDENTIFIER,
-            "ONLY": TokenType.ONLY,
-            "OPERATOR": TokenType.OPERATOR,
             "REGCLASS": TokenType.OBJECT_IDENTIFIER,
             "REGCOLLATION": TokenType.OBJECT_IDENTIFIER,
             "REGCONFIG": TokenType.OBJECT_IDENTIFIER,
@@ -295,8 +336,7 @@ class Postgres(Dialect):
             "REGPROCEDURE": TokenType.OBJECT_IDENTIFIER,
             "REGROLE": TokenType.OBJECT_IDENTIFIER,
             "REGTYPE": TokenType.OBJECT_IDENTIFIER,
-            "INT8": TokenType.BIGINT
-
+            "FLOAT": TokenType.DOUBLE,
         }
 
         SINGLE_TOKENS = {
@@ -322,6 +362,7 @@ class Postgres(Dialect):
             "MAKE_TIME": exp.TimeFromParts.from_arg_list,
             "MAKE_TIMESTAMP": exp.TimestampFromParts.from_arg_list,
             "NOW": exp.CurrentTimestamp.from_arg_list,
+            "REGEXP_REPLACE": _build_regexp_replace,
             "TO_CHAR": build_formatted_time(exp.TimeToStr, "postgres"),
             "TO_TIMESTAMP": _build_to_timestamp,
             "UNNEST": exp.Explode.from_arg_list,
@@ -343,12 +384,12 @@ class Postgres(Dialect):
 
         RANGE_PARSERS = {
             **parser.Parser.RANGE_PARSERS,
-            TokenType.AT_GT: binary_range_parser(exp.ArrayContains),
+            TokenType.AT_GT: binary_range_parser(exp.ArrayContainsAll),
             TokenType.DAMP: binary_range_parser(exp.ArrayOverlaps),
             TokenType.DAT: lambda self, this: self.expression(
                 exp.MatchAgainst, this=self._parse_bitwise(), expressions=[this]
             ),
-            TokenType.LT_AT: binary_range_parser(exp.ArrayContained),
+            TokenType.LT_AT: binary_range_parser(exp.ArrayContainsAll, reverse_args=True),
             TokenType.OPERATOR: lambda self, this: self._parse_operator(this),
         }
 
@@ -367,6 +408,13 @@ class Postgres(Dialect):
             TokenType.DARROW: lambda self, this, path: build_json_extract_path(
                 exp.JSONExtractScalar, arrow_req_json_type=self.JSON_ARROWS_REQUIRE_JSON_TYPE
             )([this, path]),
+        }
+
+        CONSTRAINT_PARSERS = {
+            **parser.Parser.CONSTRAINT_PARSERS,
+            "COLLATE": lambda self: self.expression(
+                exp.CollateColumnConstraint, this=self._parse_var(any_token=True)
+            ),
         }
 
         def _parse_operator(self, this: t.Optional[exp.Expression]) -> t.Optional[exp.Expression]:
@@ -447,8 +495,7 @@ class Postgres(Dialect):
                 else f"{self.normalize_func('ARRAY')}[{self.expressions(e, flat=True)}]"
             ),
             exp.ArrayConcat: rename_func("ARRAY_CAT"),
-            exp.ArrayContained: lambda self, e: self.binary(e, "<@"),
-            exp.ArrayContains: lambda self, e: self.binary(e, "@>"),
+            exp.ArrayContainsAll: lambda self, e: self.binary(e, "@>"),
             exp.ArrayOverlaps: lambda self, e: self.binary(e, "&&"),
             exp.ArrayFilter: filter_array_using_unnest,
             exp.ArraySize: lambda self, e: self.func("ARRAY_LENGTH", e.this, e.expression or "1"),
@@ -505,7 +552,7 @@ class Postgres(Dialect):
             exp.Substring: _substring_sql,
             exp.TimeFromParts: rename_func("MAKE_TIME"),
             exp.TimestampFromParts: rename_func("MAKE_TIMESTAMP"),
-            exp.TimestampTrunc: timestamptrunc_sql,
+            exp.TimestampTrunc: timestamptrunc_sql(zone=True),
             exp.TimeStrToTime: timestrtotime_sql,
             exp.TimeToStr: lambda self, e: self.func("TO_CHAR", e.this, self.format_time(e)),
             exp.ToChar: lambda self, e: self.function_fallback_sql(e),
@@ -520,6 +567,7 @@ class Postgres(Dialect):
             exp.VariancePop: rename_func("VAR_POP"),
             exp.Variance: rename_func("VAR_SAMP"),
             exp.Xor: bool_xor_sql,
+            exp.UnixToTime: _unix_to_time_sql,
         }
         TRANSFORMS.pop(exp.CommentColumnConstraint)
 
@@ -570,3 +618,15 @@ class Postgres(Dialect):
             expressions = [f"{self.sql(e)} @@ {this}" for e in expression.expressions]
             sql = " OR ".join(expressions)
             return f"({sql})" if len(expressions) > 1 else sql
+
+        def alterset_sql(self, expression: exp.AlterSet) -> str:
+            exprs = self.expressions(expression, flat=True)
+            exprs = f"({exprs})" if exprs else ""
+
+            access_method = self.sql(expression, "access_method")
+            access_method = f"ACCESS METHOD {access_method}" if access_method else ""
+            tablespace = self.sql(expression, "tablespace")
+            tablespace = f"TABLESPACE {tablespace}" if tablespace else ""
+            option = self.sql(expression, "option")
+
+            return f"SET {exprs}{access_method}{tablespace}{option}"

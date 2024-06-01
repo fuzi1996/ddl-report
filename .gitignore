@@ -2,7 +2,7 @@
 
 **/__pycache__/**
 
-tests/demo.py
+tests/test_sort.py
 
 ddl_report.spec
 
