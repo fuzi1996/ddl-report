@@ -36,6 +36,29 @@ class TestParseCreateTable(unittest.TestCase):
             else:
                 self.assertEqual(type, "VARCHAR(2000)")
 
+    def test_create_table2(self):
+        sql = """
+            CREATE TABLE test1 (
+                a text COLLATE "de_DE",
+                b text COLLATE "es_ES",
+            );
+        """
+        parse = Parser()
+        parse.parse(sql)
+
+        parse_result = parse.get_parse_result()
+        create_tables: List[CreateTableDesc] = parse_result.get_create_tables()
+        self.assertEqual(len(create_tables), 1)
+
+        create_table = create_tables[0]
+        self.assertEqual(create_table.table, "test1")
+        columns = create_table.columns
+        self.assertEqual(len(columns), 2)
+        for column_def in columns:
+            self.assertIn(column_def.column, ["a", "b"])
+            type = column_def.type
+            self.assertEqual(type, "TEXT")
+
 
 class TestCreateTableGenerator(unittest.TestCase):
     def test_create_table(self):
@@ -52,7 +75,7 @@ class TestCreateTableGenerator(unittest.TestCase):
         parse_result = parse.get_parse_result()
         print(Generate.generate(parse_result))
 
-    def test_create_table(self):
+    def test_create_table2(self):
         sql = """
                     create table a_table
                     (
@@ -64,5 +87,17 @@ class TestCreateTableGenerator(unittest.TestCase):
         parse = Parser()
         parse.parse(sql)
         parse.parse("COMMENT ON TABLE a_table IS 'a'")
+        parse_result = parse.get_parse_result()
+        print(Generate.generate(parse_result))
+
+    def test_create_table3(self):
+        sql = """
+                CREATE TABLE test1 (
+                    a text COLLATE "de_DE",
+                    b text COLLATE "es_ES"
+                );
+        """
+        parse = Parser()
+        parse.parse(sql)
         parse_result = parse.get_parse_result()
         print(Generate.generate(parse_result))

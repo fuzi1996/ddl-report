@@ -28,7 +28,11 @@ def collect_sql_files(filepath: str) -> List[str]:
 
 def read_sql_file(list: List[SqlWrapper], filepath: str):
     with open(filepath, "r", encoding='utf8') as f:
-        sql_lines = f.read().split(";")
+        read_content = f.read()
+        lines = read_content.split('\n')
+        filtered_lines = "\n".join([line for line in lines if not line.startswith('--')])
+        sql_lines = filtered_lines.split(";")
+
         for sql_line in sql_lines:
             if sql_line is not None and len(sql_line) > 0:
                 list.append(SqlWrapper(sql_line, filepath))
