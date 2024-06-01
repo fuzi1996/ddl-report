@@ -33,19 +33,23 @@ def collect_sql_files(filepath: str) -> List[str]:
 def read_sql_file(list: List[SqlWrapper], filepath: str):
     with open(filepath, "r", encoding='utf8') as f:
         read_content = f.read()
-        lines = read_content.split('\n')
-        filtered_lines = []
-        for line in lines:
-            if not line.startswith('--'):
-                filtered_lines.append(line)
-            else:
-                log.info(f"{line} 为注释,已忽略")
-        filtered_sql = "\n".join(filtered_lines)
-        sql_lines = filtered_sql.split(";")
+        read_sqls(read_content, list, filepath)
 
-        for sql_line in sql_lines:
-            if sql_line is not None and len(sql_line) > 0:
-                list.append(SqlWrapper(sql_line, filepath))
+
+def read_sqls(content: str, list: List[SqlWrapper], filepath: str):
+    lines = content.split('\n')
+    filtered_lines = []
+    for line in lines:
+        if not line.startswith('--'):
+            filtered_lines.append(line)
+        else:
+            log.info(f"{line} 为注释,已忽略")
+    filtered_sql = "\n".join(filtered_lines)
+    sql_lines = filtered_sql.split(";")
+
+    for sql_line in sql_lines:
+        if sql_line is not None and len(sql_line) > 0:
+            list.append(SqlWrapper(sql_line, filepath))
 
 
 if __name__ == '__main__':

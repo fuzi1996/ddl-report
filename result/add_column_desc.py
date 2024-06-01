@@ -10,11 +10,11 @@ class AddColumnDesc():
         table = expression.find(Table)
 
         # 所属表
-        self.table = table.name
+        self.table = table.name.lower()
         # 字段
-        self.column = action.name
+        self.column = action.name.lower()
         # 类型
         dtype = action.args.get('kind')
-        self.type = dtype.sql()
+        self.type = dtype.sql().lower()
         # 对应 expression
         self.expression: AlterTable = expression

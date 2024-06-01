@@ -30,11 +30,11 @@ class TestParseCreateTable(unittest.TestCase):
             self.assertIn(column_def.column, ["column_id", "column_2", "column_3"])
             type = column_def.type
             if column_def.column == "column_id":
-                self.assertEqual(type, "BIGINT")
+                self.assertEqual(type, "bigint")
             elif column_def.column == "column_2":
-                self.assertEqual(type, "DATE")
+                self.assertEqual(type, "date")
             else:
-                self.assertEqual(type, "VARCHAR(2000)")
+                self.assertEqual(type, "varchar(2000)")
 
     def test_create_table2(self):
         sql = """
@@ -57,7 +57,7 @@ class TestParseCreateTable(unittest.TestCase):
         for column_def in columns:
             self.assertIn(column_def.column, ["a", "b"])
             type = column_def.type
-            self.assertEqual(type, "TEXT")
+            self.assertEqual(type, "text")
 
 
 class TestCreateTableGenerator(unittest.TestCase):

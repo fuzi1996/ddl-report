@@ -6,14 +6,16 @@ class TableChange(BaseGenerator):
 
     def generate_create_table(self) -> str:
         create_tables = self.parse_result.get_create_tables()
-        return "\n".join([self._generate_one_create_tables(create_table) for create_table in create_tables])
+        return "\n".join(
+            [self._generate_one_create_tables(create_table) for create_table in self.sort_list(create_tables, 'table')])
 
     def _generate_one_create_tables(self, create_table: CreateTableDesc) -> str:
         table_name = create_table.table
         table_comment = self.parse_result.get_table_comment(table_name) or ""
         create_table_header = f"{table_name}({table_comment})" if len(table_comment) > 0 else table_name
         columns = []
-        for column_def in create_table.columns:
+
+        for column_def in self.sort_list(create_table.columns, 'column'):
             column_name = column_def.column
             column_type = column_def.type
             column_comment = self.parse_result.get_column_comment(table_name, column_name) or ""
@@ -31,7 +33,8 @@ class TableChange(BaseGenerator):
         indexs = self.parse_result.get_add_indexs()
         if len(indexs) > 0:
             index_desc = []
-            for index in indexs:
+
+            for index in self.sort_list(indexs, 'table'):
                 index_name = index.name
                 table_name = index.table
                 index_comment = ""
@@ -56,7 +59,7 @@ class TableChange(BaseGenerator):
 
     def generate_drop_table(self) -> str:
         tables = self.parse_result.get_drop_tables()
-        return "无" if len(tables) > 0 else "\n".join([f"- {table}" for table in tables])
+        return "无" if len(tables) > 0 else "\n".join([f"- {table}" for table in self.sort_list(tables)])
 
     def generate(self) -> str:
         create_table = self.generate_create_table() or "无"
