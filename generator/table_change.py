@@ -15,7 +15,7 @@ class TableChange(BaseGenerator):
         create_table_header = f"{table_name}({table_comment})" if len(table_comment) > 0 else table_name
         columns = []
 
-        for column_def in self.sort_list(create_table.columns, 'column'):
+        for column_def in create_table.columns:
             column_name = column_def.column
             column_type = column_def.type
             column_comment = self.parse_result.get_column_comment(table_name, column_name) or ""
