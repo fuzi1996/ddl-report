@@ -12,9 +12,11 @@ from typing import List
 from natsort import natsorted
 
 from generator import Generate
-from log.log import config_logging
+from log.log import config_logging, get_logger
 from parse.parser import Parser
 from result.sql_wrapper import SqlWrapper
+
+log = get_logger(__name__)
 
 
 def collect_sql_files(filepath: str) -> List[str]:
@@ -30,8 +32,14 @@ def read_sql_file(list: List[SqlWrapper], filepath: str):
     with open(filepath, "r", encoding='utf8') as f:
         read_content = f.read()
         lines = read_content.split('\n')
-        filtered_lines = "\n".join([line for line in lines if not line.startswith('--')])
-        sql_lines = filtered_lines.split(";")
+        filtered_lines = []
+        for line in lines:
+            if not line.startswith('--'):
+                filtered_lines.append(line)
+            else:
+                log.info(f"{line} 为注释,已忽略")
+        filtered_sql = "\n".join(filtered_lines)
+        sql_lines = filtered_sql.split(";")
 
         for sql_line in sql_lines:
             if sql_line is not None and len(sql_line) > 0:
@@ -50,8 +58,11 @@ if __name__ == '__main__':
     args = arg_parser.parse_args()
 
     dir_path = args.dir_path
+    log.info(f"读取 {dir_path} 下所有sql文件")
     is_debug = args.verbose
+    log.info(f"当前是否为 debug 模式: {is_debug}")
     output_path = args.output
+    log.info(f"文件输出路径: {output_path}")
 
     sql_files = collect_sql_files(dir_path)
     wrapper_list: List[SqlWrapper] = []
