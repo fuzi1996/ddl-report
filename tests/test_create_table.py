@@ -51,3 +51,18 @@ class TestCreateTableGenerator(unittest.TestCase):
         parse.parse(sql)
         parse_result = parse.get_parse_result()
         print(Generate.generate(parse_result))
+
+    def test_create_table(self):
+        sql = """
+                    create table a_table
+                    (
+                        column_id      int8 not null constraint a_table_pk primary key,
+                        column_2       date,
+                        column_3       varchar(2000)
+                    );
+                """
+        parse = Parser()
+        parse.parse(sql)
+        parse.parse("COMMENT ON TABLE a_table IS 'a'")
+        parse_result = parse.get_parse_result()
+        print(Generate.generate(parse_result))
