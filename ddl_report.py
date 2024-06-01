@@ -18,6 +18,8 @@ from result.sql_wrapper import SqlWrapper
 
 log = get_logger(__name__)
 
+VERSION = "0.0.2"
+
 
 def collect_sql_files(filepath: str) -> List[str]:
     is_dir = os.path.isdir(filepath)
@@ -47,14 +49,16 @@ def read_sql_file(list: List[SqlWrapper], filepath: str):
 
 
 if __name__ == '__main__':
-
     handlers = [logging.FileHandler(filename="ddl_report.log", mode="a", encoding="utf-8")]
     config_logging(logging.INFO, handlers=handlers)
+
+    log.info(f"当前版本: {VERSION}")
 
     arg_parser = argparse.ArgumentParser(prog='DDL Report', description='解析SQL DDL,生成数据结构变动报告')
     arg_parser.add_argument('dir_path', help='sql文件所在目录,支持解析深层目录')
     arg_parser.add_argument('-o', '--output', default='数据结构变动.md', help='输出文件位置')
-    arg_parser.add_argument('-v', '--verbose', default=False, action='store_true', help='是否输出调试信息')
+    arg_parser.add_argument('--verbose', default=False, action='store_true', help='是否输出调试信息')
+    arg_parser.add_argument('-v', '--version', help='输出版本', action='version', version=f'%(prog)s {VERSION}')
     args = arg_parser.parse_args()
 
     dir_path = args.dir_path
