@@ -21,6 +21,8 @@ class ParseResult:
 
         self._update_views: List[str] = []
 
+        self._rename_tables: Dict[str, str] = {}
+
         # 元素中每一项都是drop的表名
         self._drop_tables: List[str] = []
 
@@ -66,6 +68,9 @@ class ParseResult:
         }
         """
         self._column_comments: Dict[str, Dict[str, str]] = {}
+
+    def get_rename_tables(self) -> Dict[str, str]:
+        return self._rename_tables
 
     def get_create_tables(self) -> List[CreateTableDesc]:
         return self._create_tables
@@ -117,6 +122,23 @@ class ParseResult:
 
     def get_drop_column_defaults(self) -> List[DropColumnDefaultDesc]:
         return self._drop_column_defaults
+
+    def append_rename_table(self, old_table: str, new_table: str) -> None:
+        new_table_in_dict = self._rename_tables.get(old_table)
+        if new_table_in_dict is not None:
+            if not new_table_in_dict.__eq__(new_table):
+                log.warning(f"表 {old_table} 重命名重复 \n1.{new_table_in_dict} \n2.{new_table}")
+
+        cicle_flag = False
+        # a -> b
+        # b -> c
+        for o_t, n_t in self._rename_tables.items():
+            if old_table.__eq__(n_t):
+                log.info(f"表 {o_t} 已被重命名为 {n_t},{old_table} 又被重命名为 {new_table},{o_t} --> {new_table}")
+                self._rename_tables[o_t] = new_table
+                cicle_flag = True
+        if not cicle_flag:
+            self._rename_tables[old_table] = new_table
 
     def append_create_table(self, desc: CreateTableDesc):
         table = desc.table
