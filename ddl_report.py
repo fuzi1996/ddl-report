@@ -18,7 +18,7 @@ from result.sql_wrapper import SqlWrapper
 
 log = get_logger(__name__)
 
-VERSION = "0.0.2"
+VERSION = "0.0.3"
 
 
 def collect_sql_files(filepath: str) -> List[str]:

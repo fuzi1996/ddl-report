@@ -54,6 +54,13 @@ class AlterTable(ExpressionHandler):
                     new_column = action.args.get('to')
                     table_name = table.name
                     self.parse_result.append_rename_column(table_name, old_column.name, new_column.name)
+                elif isinstance(action, RenameTable):
+                    table: Table = expression.args.get('this')
+                    old_table: str = table.name
+                    rename_table: RenameTable = expression.find(RenameTable)
+                    new_table: Table = rename_table.args.get('this')
+                    new_table_name = new_table.name
+                    self.parse_result.append_rename_table(old_table, new_table_name)
                 else:
                     self.parse_result.append_cant_parse(sqlWrapper.sql)
         else:

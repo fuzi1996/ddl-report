@@ -61,12 +61,28 @@ class TableChange(BaseGenerator):
         tables = self.parse_result.get_drop_tables()
         return "无" if len(tables) > 0 else "\n".join([f"- {table}" for table in self.sort_list(tables)])
 
+    def generate_rename_table(self) -> str:
+        tables = self.parse_result.get_rename_tables()
+        if len(tables) > 0:
+            result = '\n'.join(
+                [f"| {old_table} | {new_table} |" for old_table, new_table in self.sort_dict(tables).items()])
+            return f"""| 旧表名 | 新表名 |
+| --- | --- |
+{result}"""
+        else:
+            return None
+
     def generate(self) -> str:
         create_table = self.generate_create_table() or "无"
         create_index = self.generate_create_index() or "无"
         drop_table = self.generate_drop_table() or "无"
+        rename_table = self.generate_rename_table() or "无"
 
         return f"""## 数据表
+
+### 表重命名
+
+{rename_table}
 
 ### 删除表
 
