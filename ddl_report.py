@@ -15,11 +15,9 @@ from generator import Generate
 from log.log import config_logging, get_logger
 from parse.parser import Parser
 from result.sql_wrapper import SqlWrapper
+from version import VERSION
 
 log = get_logger(__name__)
-
-VERSION = "0.0.3"
-
 
 def collect_sql_files(filepath: str) -> List[str]:
     is_dir = os.path.isdir(filepath)

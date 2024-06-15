@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-from ddl_report import VERSION
+from version import VERSION
 
 setup(
     name="ddl-report",
@@ -10,6 +10,7 @@ setup(
     python_requires=">=3.7",
     install_requires=[
         'sqlglot==24.1.0',
-        'natsort==8.4.0'
+        'natsort==8.4.0',
+        'pyinstaller==6.8.0'
     ]
 )

@@ -1,0 +1,86 @@
+ name: Windows Build and Release
+
+ on:
+   push:
+     branches:
+       - master
+
+ jobs:
+   build-on-windows:
+     runs-on: windows-latest
+     env:
+       PYTHONIOENCODING: utf-8
+     steps:
+       - name: Checkout code
+         uses: actions/checkout@v2
+
+       - name: Set up Python 3.8
+         uses: actions/setup-python@v2
+         with:
+           python-version: 3.8
+
+       - name: Install dependencies
+         run: pip3 install -e.
+
+       - name: Run tests
+         run: python3 -m unittest
+
+       - name: Package
+         run: pyinstaller -F .\ddl_report.py
+
+       - name: Upload Artifact
+         uses: actions/upload-artifact@v2
+         with:
+           name: test_github_action
+           path: dist
+
+   build-on-linux:
+     runs-on: ubuntu-latest
+     needs: build-on-windows
+     env:
+       PYTHONIOENCODING: utf-8
+     steps:
+       - name: Checkout code
+         uses: actions/checkout@v2
+
+       - name: Set up Python 3.8
+         uses: actions/setup-python@v2
+         with:
+           python-version: 3.8
+
+       - name: Install dependencies
+         run: pip3 install -e.
+
+       - name: Run tests
+         run: python3 -m unittest
+
+       - name: Get Version
+         id: get_version
+         run: |
+          VERSION=$(python3 ./version.py)
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+       - name: Package
+         run: pyinstaller -F ./ddl_report.py
+
+       - name: Download Artifact
+         uses: actions/download-artifact@v2
+         with:
+           name: test_github_action
+           path: dist-win
+
+       - name: Package
+         run: ls -R
+
+       - name: Upload to Release
+         uses: softprops/action-gh-release@v2.0.5
+         env:
+           GITHUB_TOKEN: ${{ secrets.SELF_TOKEN }}
+         with:
+           files: |
+            dist/ddl_report
+            dist-win/ddl_report.exe
+           tag_name: ${{ steps.get_version.outputs.VERSION }}
+           name: ${{ steps.get_version.outputs.VERSION }}
+           draft: false
+           prerelease: false
