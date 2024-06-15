@@ -1,0 +1,47 @@
+name: Test
+
+on:
+  pull_request:
+    paths-ignore:
+      - "**.md"
+      - ".github/**"
+  workflow_dispatch:
+
+jobs:
+ test-on-windows:
+   runs-on: windows-latest
+   env:
+     PYTHONIOENCODING: utf-8
+   steps:
+     - name: Checkout code
+       uses: actions/checkout@v4
+
+     - name: Set up Python 3.8
+       uses: actions/setup-python@v5
+       with:
+         python-version: 3.8
+
+     - name: Install dependencies
+       run: pip3 install -e.
+
+     - name: Run tests
+       run: python3 -m unittest
+
+ test-on-linux:
+   runs-on: ubuntu-latest
+   env:
+     PYTHONIOENCODING: utf-8
+   steps:
+     - name: Checkout code
+       uses: actions/checkout@v4
+
+     - name: Set up Python 3.8
+       uses: actions/setup-python@v5
+       with:
+         python-version: 3.8
+
+     - name: Install dependencies
+       run: pip3 install -e.
+
+     - name: Run tests
+       run: python3 -m unittest
